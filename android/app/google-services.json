@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "477245821723",
+    "project_id": "pathwise-aedc5",
+    "storage_bucket": "pathwise-aedc5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477245821723:android:fd5c0b6a463dff1f61b9be",
+        "android_client_info": {
+          "package_name": "com.example.pathwise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "477245821723-6d97oq898t1onvp500nsko74m2cruv7m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pathwise",
+            "certificate_hash": "3ccef3c62f142b1e0368e4087988c7f2d79faf00"
+          }
+        },
+        {
+          "client_id": "477245821723-lvsdjo8p2ntmf2rlm6p1hjs43p50d56g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYstC9FSwCssYIcZEoiLm3yHogd0BdhSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "477245821723-fqadufp5lftoq4ueiq8d77jupcj413ar.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

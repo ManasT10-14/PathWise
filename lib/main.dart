@@ -15,6 +15,9 @@ import 'services/payment_service.dart';
 import 'services/review_repository.dart';
 import 'services/roadmap_repository.dart';
 import 'services/user_repository.dart';
+import 'theme/app_theme.dart';
+
+ValueNotifier<ThemeMode> themeMode = ValueNotifier(ThemeMode.dark);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,13 +83,15 @@ class _PathwiseAppState extends State<PathwiseApp> {
         reviews: _reviews,
         ai: _ai,
         payments: _payments,
-        child: MaterialApp(
-          title: 'Pathwise',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF2E7D32)),
-            useMaterial3: true,
+        child: ValueListenableBuilder<ThemeMode>(
+          valueListenable: themeMode,
+          builder: (context, mode, _) => MaterialApp(
+            title: 'Pathwise',
+            theme: AppTheme.light(),
+            darkTheme: AppTheme.dark(),
+            themeMode: mode,
+            home: const _AuthGate(),
           ),
-          home: const _AuthGate(),
         ),
       ),
     );

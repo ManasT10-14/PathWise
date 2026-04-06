@@ -126,6 +126,112 @@ def write_expert_annotation(
     )
 
 
+def write_struggle_pattern(
+    user_id: str,
+    roadmap_id: str,
+    stalled_stage: str,
+    stall_days: int,
+    resolution: str = "replanned",
+) -> None:
+    """Record a struggle pattern when a learner's progress stalls on a stage.
+
+    Called by the replan endpoint when stall_days > 0. Tracks which topics
+    caused stalls and how they were resolved, enabling the AI to preemptively
+    address similar weaknesses in future roadmaps.
+
+    Args:
+        user_id: Firebase UID of the learner.
+        roadmap_id: Firestore document ID of the roadmap where stall occurred.
+        stalled_stage: The stage level that stalled (e.g., "intermediate").
+        stall_days: Number of days the stage was stalled.
+        resolution: How the stall was resolved (default: "replanned").
+    """
+    pattern_entry = {
+        "roadmap_id": roadmap_id,
+        "stalled_stage": stalled_stage,
+        "stall_days": stall_days,
+        "resolution": resolution,
+        "recorded_at": firestore.SERVER_TIMESTAMP,
+    }
+
+    db = firestore.client()
+    doc_ref = (
+        db.collection("users")
+        .document(user_id)
+        .collection("learner_memory")
+        .document("struggle_patterns")
+    )
+
+    existing_doc = doc_ref.get()
+    if existing_doc.exists:
+        doc_ref.update({"patterns": ArrayUnion([pattern_entry])})
+    else:
+        doc_ref.set({"patterns": [pattern_entry]})
+
+    log.info(
+        "struggle_pattern_written",
+        user_id=user_id,
+        stalled_stage=stalled_stage,
+        stall_days=stall_days,
+    )
+
+
+def write_pace_trend(
+    user_id: str,
+    roadmap_id: str,
+    stage_progress: dict[str, float],
+    days_elapsed: int,
+) -> None:
+    """Record a pace trend snapshot for the learner.
+
+    Called during replan to track the learner's actual velocity vs. planned
+    timeline. Over multiple snapshots, this reveals whether the learner
+    consistently over- or under-estimates their pace.
+
+    Args:
+        user_id: Firebase UID of the learner.
+        roadmap_id: Firestore document ID of the roadmap.
+        stage_progress: Current stageProgress map (e.g., {"beginner": 0.8, "intermediate": 0.2}).
+        days_elapsed: Days since roadmap creation or last replan.
+    """
+    total_progress = sum(stage_progress.values()) / max(len(stage_progress), 1)
+
+    pace_entry = {
+        "roadmap_id": roadmap_id,
+        "stage_progress": stage_progress,
+        "total_progress": round(total_progress, 3),
+        "days_elapsed": days_elapsed,
+        "recorded_at": firestore.SERVER_TIMESTAMP,
+    }
+
+    db = firestore.client()
+    doc_ref = (
+        db.collection("users")
+        .document(user_id)
+        .collection("learner_memory")
+        .document("pace_trends")
+    )
+
+    existing_doc = doc_ref.get()
+    if existing_doc.exists:
+        existing_entries = existing_doc.to_dict().get("snapshots", [])
+    else:
+        existing_entries = []
+
+    updated = existing_entries + [pace_entry]
+    if len(updated) > _MAX_HISTORY_ENTRIES:
+        updated = updated[-_MAX_HISTORY_ENTRIES:]
+
+    doc_ref.set({"snapshots": updated}, merge=False)
+
+    log.info(
+        "pace_trend_written",
+        user_id=user_id,
+        total_progress=round(total_progress, 3),
+        days_elapsed=days_elapsed,
+    )
+
+
 def read_learner_memory(user_id: str) -> dict:
     """Read all learner_memory subdocuments and return a merged dict for prompt injection.
 
@@ -145,6 +251,8 @@ def read_learner_memory(user_id: str) -> dict:
     empty_result: dict = {
         "analysis_history": [],
         "expert_annotations": [],
+        "struggle_patterns": [],
+        "pace_trends": [],
         "has_memory": False,
     }
 
@@ -158,6 +266,8 @@ def read_learner_memory(user_id: str) -> dict:
 
         history_doc = memory_col.document("analysis_history").get()
         annotations_doc = memory_col.document("expert_annotations").get()
+        struggles_doc = memory_col.document("struggle_patterns").get()
+        pace_doc = memory_col.document("pace_trends").get()
 
         analysis_history: list[dict] = []
         if history_doc.exists:
@@ -167,19 +277,31 @@ def read_learner_memory(user_id: str) -> dict:
         if annotations_doc.exists:
             expert_annotations = annotations_doc.to_dict().get("annotations", [])
 
-        has_memory = bool(analysis_history or expert_annotations)
+        struggle_patterns: list[dict] = []
+        if struggles_doc.exists:
+            struggle_patterns = struggles_doc.to_dict().get("patterns", [])
+
+        pace_trends: list[dict] = []
+        if pace_doc.exists:
+            pace_trends = pace_doc.to_dict().get("snapshots", [])
+
+        has_memory = bool(analysis_history or expert_annotations or struggle_patterns or pace_trends)
 
         log.info(
             "memory_read",
             user_id=user_id,
             history_count=len(analysis_history),
             annotation_count=len(expert_annotations),
+            struggle_count=len(struggle_patterns),
+            pace_count=len(pace_trends),
             has_memory=has_memory,
         )
 
         return {
             "analysis_history": analysis_history,
             "expert_annotations": expert_annotations,
+            "struggle_patterns": struggle_patterns,
+            "pace_trends": pace_trends,
             "has_memory": has_memory,
         }
 

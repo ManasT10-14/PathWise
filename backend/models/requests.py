@@ -106,3 +106,33 @@ class ReplanRequest(BaseModel):
         if isinstance(values.get("learner_feedback"), str):
             values["learner_feedback"] = _strip_control_chars(values["learner_feedback"])
         return values
+
+
+class AnnotateRequest(BaseModel):
+    """Request body for POST /api/v1/roadmaps/annotate.
+
+    Allows experts to annotate specific milestones on a learner's roadmap.
+    Annotations are stored in learner memory and injected into future replans (EXP-04, EXP-05).
+    """
+
+    learner_id: str = Field(
+        description="Firebase UID of the learner whose roadmap is being annotated"
+    )
+    roadmap_id: str = Field(
+        description="Firestore document ID of the roadmap being annotated"
+    )
+    milestone_level: str = Field(
+        description="The roadmap stage level being annotated (e.g., 'beginner', 'intermediate', 'advanced')"
+    )
+    annotation_text: str = Field(
+        max_length=800,
+        description="Expert's observation or recommendation for this milestone"
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def sanitize_annotation(cls, values: dict) -> dict:
+        """Strip control characters from annotation_text (SEC-03)."""
+        if isinstance(values.get("annotation_text"), str):
+            values["annotation_text"] = _strip_control_chars(values["annotation_text"])
+        return values

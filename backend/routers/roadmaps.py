@@ -20,10 +20,16 @@ from slowapi.errors import RateLimitExceeded
 
 from config import settings
 from dependencies import get_current_user, limiter
-from models.requests import AnalyzeRequest, ReplanRequest
+from models.requests import AnalyzeRequest, AnnotateRequest, ReplanRequest
 from models.responses import AnalyzeResponse, ReplanResponse
 from services.firestore_writer import write_roadmap
-from services.memory_writer import read_learner_memory, write_analysis_memory
+from services.memory_writer import (
+    read_learner_memory,
+    write_analysis_memory,
+    write_expert_annotation,
+    write_pace_trend,
+    write_struggle_pattern,
+)
 from services.prompt_chain import ChainStepError, run_analysis_chain
 from services.replanner import ReplanStepError, run_replan_chain
 
@@ -323,6 +329,27 @@ async def replan_roadmap(
         "generatedBy": "gemini-2.5-flash-replan",
     })
 
+    # Write struggle pattern and pace trend to learner memory (ADAPT-04)
+    try:
+        if body.stall_days and body.stall_days > 0:
+            # Find which stages are stalled (progress < 1.0)
+            for stage, progress in body.current_progress.items():
+                if progress < 1.0:
+                    write_struggle_pattern(
+                        user_id=user_id,
+                        roadmap_id=body.roadmap_id,
+                        stalled_stage=stage,
+                        stall_days=body.stall_days,
+                    )
+        write_pace_trend(
+            user_id=user_id,
+            roadmap_id=body.roadmap_id,
+            stage_progress=body.current_progress,
+            days_elapsed=body.stall_days or 0,
+        )
+    except Exception as mem_exc:
+        log.warning("replan_memory_write_failed", user_id=user_id, error=str(mem_exc))
+
     log.info(
         "replan_complete",
         user_id=user_id,
@@ -338,3 +365,82 @@ async def replan_roadmap(
         stalled_stages=replan_result.get("stalled_stages", []),
         version=new_version,
     )
+
+
+@router.post(
+    "/annotate",
+    summary="Expert annotates a learner's roadmap milestone",
+    description=(
+        "Allows verified experts to annotate specific milestones on a learner's roadmap. "
+        "Annotations are stored in the learner's memory subcollection and injected into "
+        "future replan prompts, creating the expert-AI feedback loop (EXP-04, EXP-05)."
+    ),
+    responses={
+        200: {"description": "Annotation stored successfully"},
+        401: {"description": "Missing or invalid Firebase ID token"},
+        403: {"description": "User is not a verified expert"},
+        500: {"description": "Unexpected internal server error"},
+    },
+)
+async def annotate_roadmap(
+    request: Request,
+    body: AnnotateRequest,
+    user: dict = Depends(get_current_user),
+) -> dict:
+    """Store an expert's annotation on a learner's roadmap milestone.
+
+    The annotation is persisted to the learner's memory subcollection
+    (users/{learner_id}/learner_memory/expert_annotations) and will be
+    automatically injected into the replan prompt the next time the
+    learner triggers a roadmap replan.
+
+    Args:
+        body: AnnotateRequest with learner_id, roadmap_id, milestone_level, annotation_text.
+        user: Authenticated Firebase user (must be an expert).
+
+    Returns:
+        {"status": "ok", "message": "Annotation saved"}
+    """
+    request.state.user = user
+    expert_id: str = user["uid"]
+
+    log.info(
+        "annotate_start",
+        expert_id=expert_id,
+        learner_id=body.learner_id,
+        roadmap_id=body.roadmap_id,
+        milestone_level=body.milestone_level,
+    )
+
+    try:
+        write_expert_annotation(
+            user_id=body.learner_id,
+            roadmap_id=body.roadmap_id,
+            milestone_level=body.milestone_level,
+            annotation_text=body.annotation_text,
+            expert_id=expert_id,
+        )
+
+        log.info(
+            "annotate_complete",
+            expert_id=expert_id,
+            learner_id=body.learner_id,
+            milestone_level=body.milestone_level,
+        )
+
+        return {"status": "ok", "message": "Annotation saved"}
+
+    except Exception as exc:
+        log.exception(
+            "annotate_error",
+            expert_id=expert_id,
+            learner_id=body.learner_id,
+            error=str(exc),
+        )
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": "Failed to save annotation",
+                "error_code": "ANNOTATION_FAILED",
+            },
+        )

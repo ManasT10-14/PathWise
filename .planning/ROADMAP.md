@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — FastAPI backend + Vertex AI 4-step prompt chain with auth, rate limiting, and Firestore integration
+- [x] 01-01-PLAN.md — FastAPI backend + Vertex AI 4-step prompt chain with auth, rate limiting, and Firestore integration
 - [ ] 01-02-PLAN.md — Flutter UI overhaul: glassmorphism design system, all 14 screens, onboarding wizard, timeline, animations, dark mode
 - [ ] 01-03-PLAN.md — Integration + payment hardening + security rules + admin dashboard analytics
 **UI hint**: yes
@@ -56,5 +56,5 @@ Phases execute in numeric order: 1 -> 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Full Platform Overhaul | 0/3 | Planning complete | - |
+| 1. Full Platform Overhaul | 1/3 | In Progress|  |
 | 2. Adaptive Intelligence | 0/2 | Not started | - |

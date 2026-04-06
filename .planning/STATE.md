@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
+stopped_at: Completed 01-01-PLAN.md — FastAPI backend with Vertex AI 4-step prompt chain
+last_updated: "2026-04-06T20:41:55.632Z"
+last_activity: 2026-04-06
+progress:
+  total_phases: 2
+  completed_phases: 0
+  total_plans: 3
+  completed_plans: 1
+  percent: 0
+---
+
 # Project State
 
 ## Project Reference
@@ -5,20 +21,21 @@
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** Users get a personalized, continuously-adapting learning roadmap that evolves based on their progress, struggles, and expert feedback.
-**Current focus:** Phase 1: Full Platform Overhaul
+**Current focus:** Phase 01 — full-platform-overhaul
 
 ## Current Position
 
-Phase: 1 of 2 (Full Platform Overhaul)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-04-07 -- Roadmap created
+Phase: 01 (full-platform-overhaul) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-06
 
 Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: -
 - Total execution time: 0 hours
@@ -30,10 +47,12 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: -
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01-full-platform-overhaul P01 | 8 | 6 tasks | 24 files |
 
 ## Accumulated Context
 
@@ -46,6 +65,9 @@ Recent decisions affecting current work:
 - Vertex AI Gemini 2.5 Flash with 4-step prompt chain (no LangGraph)
 - FastAPI backend over Firebase Cloud Functions
 - UI + AI must ship together (pretty shell without AI wastes investment, AI without polish wastes the wow moment)
+- [Phase 01-full-platform-overhaul]: Sync def (not async) for Gemini services — google-genai SDK is synchronous; FastAPI threadpool handles it
+- [Phase 01-full-platform-overhaul]: Dual-write Firestore pattern: legacy fields for existing Flutter parser + enhanced fields for new UI
+- [Phase 01-full-platform-overhaul]: Per-user rate limiting by Firebase UID (not IP) to prevent shared-NAT unfairness
 
 ### Pending Todos
 
@@ -59,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07
-Stopped at: Roadmap created, ready to plan Phase 1
+Last session: 2026-04-06T20:41:55.627Z
+Stopped at: Completed 01-01-PLAN.md — FastAPI backend with Vertex AI 4-step prompt chain
 Resume file: None

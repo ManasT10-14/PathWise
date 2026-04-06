@@ -20,16 +20,16 @@
 
 ### AI Backend
 
-- [ ] **AI-01**: FastAPI backend deployed with Firebase Admin SDK for token verification and Firestore access
-- [ ] **AI-02**: Vertex AI Gemini 2.5 Flash integration via google-genai SDK with structured JSON output (response_schema)
-- [ ] **AI-03**: 4-step prompt chain: Goal Analyzer -> Skill Gap Detector -> Roadmap Planner -> Resource Curator
-- [ ] **AI-04**: Goal Analyzer extracts structured career objective with target role, timeline, constraints from user input
-- [ ] **AI-05**: Skill Gap Detector identifies missing skills with confidence scores (0-1), prerequisite ordering, and proficiency levels
-- [ ] **AI-06**: Roadmap Planner generates multi-phase milestones with estimated hours, deadlines, and revision points
-- [ ] **AI-07**: Resource Curator maps specific free resources (URLs, types, difficulty) to each milestone
+- [x] **AI-01**: FastAPI backend deployed with Firebase Admin SDK for token verification and Firestore access
+- [x] **AI-02**: Vertex AI Gemini 2.5 Flash integration via google-genai SDK with structured JSON output (response_schema)
+- [x] **AI-03**: 4-step prompt chain: Goal Analyzer -> Skill Gap Detector -> Roadmap Planner -> Resource Curator
+- [x] **AI-04**: Goal Analyzer extracts structured career objective with target role, timeline, constraints from user input
+- [x] **AI-05**: Skill Gap Detector identifies missing skills with confidence scores (0-1), prerequisite ordering, and proficiency levels
+- [x] **AI-06**: Roadmap Planner generates multi-phase milestones with estimated hours, deadlines, and revision points
+- [x] **AI-07**: Resource Curator maps specific free resources (URLs, types, difficulty) to each milestone
 - [ ] **AI-08**: Flutter app replaces local AiRoadmapService with HTTP client calling FastAPI endpoints
-- [ ] **AI-09**: JSON validation layer with retry logic for malformed Gemini responses
-- [ ] **AI-10**: Per-user rate limiting (max 10 analyses/day, 3 replans/day)
+- [x] **AI-09**: JSON validation layer with retry logic for malformed Gemini responses
+- [x] **AI-10**: Per-user rate limiting (max 10 analyses/day, 3 replans/day)
 
 ### Adaptive Intelligence
 
@@ -58,9 +58,9 @@
 ### Security
 
 - [ ] **SEC-01**: Firebase security rules deployed for all 5 collections (users, experts, consultations, roadmaps, reviews)
-- [ ] **SEC-02**: FastAPI auth middleware verifies Firebase ID token on every request
-- [ ] **SEC-03**: Input sanitization on all AI endpoints (strip control characters, enforce length limits)
-- [ ] **SEC-04**: Resume text and career goals treated as PII -- never logged in full
+- [x] **SEC-02**: FastAPI auth middleware verifies Firebase ID token on every request
+- [x] **SEC-03**: Input sanitization on all AI endpoints (strip control characters, enforce length limits)
+- [x] **SEC-04**: Resume text and career goals treated as PII -- never logged in full
 
 ### Admin
 
@@ -115,16 +115,16 @@
 | UI-08 | Phase 1 | Pending |
 | UI-09 | Phase 1 | Pending |
 | UI-10 | Phase 1 | Pending |
-| AI-01 | Phase 1 | Pending |
-| AI-02 | Phase 1 | Pending |
-| AI-03 | Phase 1 | Pending |
-| AI-04 | Phase 1 | Pending |
-| AI-05 | Phase 1 | Pending |
-| AI-06 | Phase 1 | Pending |
-| AI-07 | Phase 1 | Pending |
+| AI-01 | Phase 1 | Complete |
+| AI-02 | Phase 1 | Complete |
+| AI-03 | Phase 1 | Complete |
+| AI-04 | Phase 1 | Complete |
+| AI-05 | Phase 1 | Complete |
+| AI-06 | Phase 1 | Complete |
+| AI-07 | Phase 1 | Complete |
 | AI-08 | Phase 1 | Pending |
-| AI-09 | Phase 1 | Pending |
-| AI-10 | Phase 1 | Pending |
+| AI-09 | Phase 1 | Complete |
+| AI-10 | Phase 1 | Complete |
 | ADAPT-01 | Phase 2 | Pending |
 | ADAPT-02 | Phase 2 | Pending |
 | ADAPT-03 | Phase 2 | Pending |
@@ -141,9 +141,9 @@
 | PAY-03 | Phase 1 | Pending |
 | PAY-04 | Phase 1 | Pending |
 | SEC-01 | Phase 1 | Pending |
-| SEC-02 | Phase 1 | Pending |
-| SEC-03 | Phase 1 | Pending |
-| SEC-04 | Phase 1 | Pending |
+| SEC-02 | Phase 1 | Complete |
+| SEC-03 | Phase 1 | Complete |
+| SEC-04 | Phase 1 | Complete |
 | ADM-01 | Phase 1 | Pending |
 | ADM-02 | Phase 1 | Pending |
 | ADM-03 | Phase 1 | Pending |

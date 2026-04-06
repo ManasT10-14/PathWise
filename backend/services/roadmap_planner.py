@@ -20,11 +20,7 @@ _PROMPT_PATH = pathlib.Path(__file__).parent.parent / "prompts" / "roadmap_plann
 _PROMPT_TEMPLATE = _PROMPT_PATH.read_text(encoding="utf-8")
 
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
-    reraise=True,
-)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10), reraise=True)
 def plan_roadmap(
     goal: GoalAnalysis,
     gaps: SkillGapAnalysis,

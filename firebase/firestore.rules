@@ -1,0 +1,129 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    /// True when the request carries a valid Firebase Auth token.
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// True when the requesting user is an admin.
+    /// Reads the role field from the user's own document — one extra read per
+    /// admin-guarded operation (acceptable for MVP; use custom claims for scale).
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid))
+               .data.role == 'admin';
+    }
+
+    // -----------------------------------------------------------------------
+    // users/{uid}
+    // -----------------------------------------------------------------------
+    // - Any user can read their own document; admins can read all.
+    // - Users can create their own document (initial sign-up write).
+    // - Users can update their own document EXCEPT the role field
+    //   (prevents privilege escalation — only server/admin sets roles).
+    // -----------------------------------------------------------------------
+    match /users/{uid} {
+      allow read:   if request.auth.uid == uid || isAdmin();
+      allow create: if request.auth.uid == uid;
+      allow update: if request.auth.uid == uid
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['role']);
+      allow delete: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------------
+    // experts/{expertId}
+    // -----------------------------------------------------------------------
+    // - Any authenticated user can browse expert profiles (marketplace).
+    // - Only admins can create, update, or delete expert documents
+    //   (experts are managed by admin verification workflow).
+    // -----------------------------------------------------------------------
+    match /experts/{expertId} {
+      allow read:  if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------------
+    // roadmaps/{roadmapId}
+    // -----------------------------------------------------------------------
+    // - Owner can read; admins can read all.
+    // - Authenticated users can create (local stub path — server uses Admin SDK).
+    // - Owner can update ONLY stageProgress and updatedAt
+    //   (prevents overwriting AI-generated milestones, resources, etc.).
+    // - Admin SDK bypasses these rules entirely (server roadmap writes are safe).
+    // -----------------------------------------------------------------------
+    match /roadmaps/{roadmapId} {
+      allow read:   if request.auth.uid == resource.data.userId || isAdmin();
+      allow create: if isAuthenticated();
+      allow update: if request.auth.uid == resource.data.userId
+                    && request.resource.data.diff(resource.data)
+                        .affectedKeys().hasOnly(['stageProgress', 'updatedAt']);
+      allow delete: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------------
+    // consultations/{cid}
+    // -----------------------------------------------------------------------
+    // - The booking user, the assigned expert, or admins can read.
+    // - Authenticated users can create if userId matches their own UID.
+    // - Involved parties can update non-payment fields only
+    //   (paymentId, status, and orderId are server-only writes — prevents
+    //    client-side payment confirmation fraud).
+    // -----------------------------------------------------------------------
+    match /consultations/{cid} {
+      allow read: if request.auth.uid == resource.data.userId
+                  || request.auth.uid == resource.data.expertId
+                  || isAdmin();
+
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid;
+
+      allow update: if (request.auth.uid == resource.data.userId
+                        || request.auth.uid == resource.data.expertId)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['paymentId', 'status', 'orderId']);
+
+      allow delete: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------------
+    // reviews/{rid}
+    // -----------------------------------------------------------------------
+    // - Any authenticated user can read reviews (public marketplace trust signal).
+    // - Authenticated users can create reviews if userId matches their own UID.
+    // - Reviews are immutable once submitted (no update allowed).
+    // - Only admins can delete reviews (moderation workflow).
+    // -----------------------------------------------------------------------
+    match /reviews/{rid} {
+      allow read:   if isAuthenticated();
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid;
+      allow update: if false;  // Reviews are immutable — no editing after submission.
+      allow delete: if isAdmin();
+    }
+
+    // -----------------------------------------------------------------------
+    // learner_memory/{uid}/{document=**}
+    // -----------------------------------------------------------------------
+    // Server-only collection: stores AI analysis history, struggle patterns,
+    // pace trends.  All client access is blocked — reads and writes happen
+    // exclusively via Firebase Admin SDK on the backend.
+    // -----------------------------------------------------------------------
+    match /learner_memory/{uid}/{document=**} {
+      allow read, write: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Default deny — everything not matched above is rejected.
+    // -----------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -22,7 +22,7 @@ from starlette.responses import Response
 
 from config import settings
 from dependencies import limiter
-from routers import health, roadmaps
+from routers import health, payments, roadmaps, webhooks
 
 # ---------------------------------------------------------------------------
 # Structlog — JSON rendering for production, pretty-printing for dev
@@ -111,3 +111,5 @@ async def _inject_request_id(request: Request, call_next: object) -> Response:
 # ---------------------------------------------------------------------------
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(roadmaps.router, prefix="/api/v1")
+app.include_router(payments.router, prefix="/api/v1")
+app.include_router(webhooks.router, prefix="/api/v1")

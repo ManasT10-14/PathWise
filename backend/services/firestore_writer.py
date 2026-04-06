@@ -108,6 +108,10 @@ def write_roadmap(user_id: str, chain_result: dict) -> str:
         "curatedResources": resources.model_dump(),
         "version": 2,
         "generatedBy": "gemini-2.5-flash",
+        # Versioning baseline for replanning (ADAPT-03)
+        # All new roadmaps start at replan_version=1 so the replan endpoint
+        # can increment to N+1 on first replan.
+        "replan_version": 1,
     }
 
     doc_ref.set(doc_data)

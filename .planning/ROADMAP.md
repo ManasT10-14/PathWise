@@ -27,12 +27,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All screens render with glassmorphism design (frosted glass cards, gradient mesh backgrounds), dark/light mode toggle works consistently, skeleton loading replaces all spinner states, and error/empty states show polished guidance
   4. Admin can view platform analytics (total users, active roadmaps, consultations this week), approve/reject expert applications, and moderate flagged reviews
   5. Skill gap analysis displays confidence scores as colored badges, Firebase security rules reject unauthorized access to all 5 collections, and AI endpoints enforce per-user rate limits
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — FastAPI backend + Vertex AI 4-step prompt chain with auth, rate limiting, and Firestore integration
+- [ ] 01-02-PLAN.md — Flutter UI overhaul: glassmorphism design system, all 14 screens, onboarding wizard, timeline, animations, dark mode
+- [ ] 01-03-PLAN.md — Integration + payment hardening + security rules + admin dashboard analytics
 **UI hint**: yes
 
 ### Phase 2: Adaptive Intelligence
@@ -56,5 +56,5 @@ Phases execute in numeric order: 1 -> 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Full Platform Overhaul | 0/3 | Not started | - |
+| 1. Full Platform Overhaul | 0/3 | Planning complete | - |
 | 2. Adaptive Intelligence | 0/2 | Not started | - |

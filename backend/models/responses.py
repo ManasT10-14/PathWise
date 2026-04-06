@@ -61,6 +61,26 @@ class AnalyzeResponse(BaseModel):
     )
 
 
+class ReplanResponse(BaseModel):
+    """Response payload for POST /api/v1/roadmaps/replan."""
+
+    new_roadmap_id: str = Field(
+        description="Firestore document ID of the new versioned roadmap"
+    )
+    replan_reason: str = Field(
+        description="AI-generated explanation of what changed and why"
+    )
+    adjusted_milestones: list[str] = Field(
+        description="New milestone strings in legacy format"
+    )
+    stalled_stages: list[str] = Field(
+        description="Stage levels identified as stalled by the AI"
+    )
+    version: int = Field(
+        description="Version number of the new roadmap (previous version + 1)"
+    )
+
+
 class ErrorResponse(BaseModel):
     """Standard error response payload."""
 

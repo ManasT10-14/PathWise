@@ -67,3 +67,42 @@ class AnalyzeRequest(BaseModel):
         if isinstance(values.get("career_goals"), str):
             values["career_goals"] = _strip_control_chars(values["career_goals"])
         return values
+
+
+class ReplanRequest(BaseModel):
+    """Request body for POST /api/v1/roadmaps/replan.
+
+    Carries the current roadmap state (id + stage progress) plus optional
+    learner-supplied context and stall detection metadata.
+    """
+
+    roadmap_id: str = Field(
+        description="Firestore document ID of the roadmap to replan"
+    )
+    current_progress: dict[str, float] = Field(
+        description=(
+            "Current stageProgress map from Firestore, "
+            "e.g. {'beginner': 0.3, 'intermediate': 0.0}"
+        )
+    )
+    learner_feedback: str = Field(
+        default="",
+        max_length=1000,
+        description="Optional learner-supplied context about why they are stuck",
+    )
+    stall_days: int | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Days the stalled stage has been unchanged; "
+            "None for user-triggered replans"
+        ),
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def sanitize_feedback(cls, values: dict) -> dict:
+        """Strip control characters from learner_feedback (SEC-03)."""
+        if isinstance(values.get("learner_feedback"), str):
+            values["learner_feedback"] = _strip_control_chars(values["learner_feedback"])
+        return values

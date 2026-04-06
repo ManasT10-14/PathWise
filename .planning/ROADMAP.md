@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User browses experts with domain filters, price range sliders, and rating thresholds, views expert profiles with full skill lists and reviews, and completes a consultation booking with Razorpay payment that is verified server-side
   3. All screens render with glassmorphism design (frosted glass cards, gradient mesh backgrounds), dark/light mode toggle works consistently, skeleton loading replaces all spinner states, and error/empty states show polished guidance
   4. Admin can view platform analytics (total users, active roadmaps, consultations this week), approve/reject expert applications, and moderate flagged reviews
-  5. Skill gap analysis displays confidence scores as colored badges, Firebase security rules reject unauthorized access to all 5 collections, and AI endpoints enforce per-user rate limits
+  5. Skill gap analysis displays confidence scores as colored badges next to each skill gap, Firebase security rules reject unauthorized access to all 5 collections, and AI endpoints enforce per-user rate limits
 **Plans**: 3 plans
 
 Plans:
@@ -43,11 +43,11 @@ Plans:
   1. When a user's milestone progress is unchanged for 14+ days, the system triggers a replan that generates an adjusted roadmap version with a clear replan reason -- previous versions are preserved, not overwritten
   2. Returning users receive AI analysis that references their history, struggle patterns, and pace trends from previous sessions -- the AI demonstrably "remembers" the learner
   3. An expert can annotate specific milestones on a learner's roadmap, and those annotations are incorporated into the next AI replan, producing visibly different recommendations than a replan without expert input
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Backend: replan endpoint, learner memory subcollection, memory-aware prompt chain, roadmap versioning
+- [ ] 02-02-PLAN.md — Frontend: replan trigger UI in roadmap screen, expert annotation interface, annotation display, wire to backend
 
 ## Progress
 

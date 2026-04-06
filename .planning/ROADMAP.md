@@ -47,7 +47,7 @@ Plans:
 
 Plans:
 - [ ] 02-01-PLAN.md — Backend: replan endpoint, learner memory subcollection, memory-aware prompt chain, roadmap versioning
-- [ ] 02-02-PLAN.md — Frontend: replan trigger UI in roadmap screen, expert annotation interface, annotation display, wire to backend
+- [x] 02-02-PLAN.md — Frontend: replan trigger UI in roadmap screen, expert annotation interface, annotation display, wire to backend
 
 ## Progress
 
@@ -57,4 +57,4 @@ Phases execute in numeric order: 1 -> 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Full Platform Overhaul | 3/3 | Complete   | 2026-04-06 |
-| 2. Adaptive Intelligence | 0/2 | Not started | - |
+| 2. Adaptive Intelligence | 1/2 | In Progress|  |

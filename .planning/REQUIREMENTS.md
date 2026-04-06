@@ -33,9 +33,9 @@
 
 ### Adaptive Intelligence
 
-- [ ] **ADAPT-01**: Dynamic replanning triggers when stageProgress unchanged for 14+ days on any milestone
-- [ ] **ADAPT-02**: Replan endpoint accepts current progress + optional learner feedback and generates adjusted roadmap
-- [ ] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason -- history preserved, not overwritten
+- [x] **ADAPT-01**: Dynamic replanning triggers when stageProgress unchanged for 14+ days on any milestone
+- [x] **ADAPT-02**: Replan endpoint accepts current progress + optional learner feedback and generates adjusted roadmap
+- [x] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason -- history preserved, not overwritten
 - [ ] **ADAPT-04**: Learner memory subcollection stores analysis history, struggle patterns, and pace trends
 - [ ] **ADAPT-05**: Memory context included in replan and subsequent analysis prompts for continuity
 - [x] **ADAPT-06**: Confidence scores displayed as colored badges next to each skill gap
@@ -45,8 +45,8 @@
 - [x] **EXP-01**: Expert discovery with search, domain filter, price range, rating filter, and sort
 - [x] **EXP-02**: Expert profile shows full skill list, experience, reviews, and AI-generated learner context during consultations
 - [x] **EXP-03**: Consultation booking flow polished with clear type selection, scheduling, and pricing
-- [ ] **EXP-04**: Expert annotation interface -- experts can add comments to learner roadmap milestones
-- [ ] **EXP-05**: Expert annotations stored and fed into AI replan prompts (expert-AI feedback loop)
+- [x] **EXP-04**: Expert annotation interface -- experts can add comments to learner roadmap milestones
+- [x] **EXP-05**: Expert annotations stored and fed into AI replan prompts (expert-AI feedback loop)
 
 ### Payment Hardening
 
@@ -125,17 +125,17 @@
 | AI-08 | Phase 1 | Complete |
 | AI-09 | Phase 1 | Complete |
 | AI-10 | Phase 1 | Complete |
-| ADAPT-01 | Phase 2 | Pending |
-| ADAPT-02 | Phase 2 | Pending |
-| ADAPT-03 | Phase 2 | Pending |
+| ADAPT-01 | Phase 2 | Complete |
+| ADAPT-02 | Phase 2 | Complete |
+| ADAPT-03 | Phase 2 | Complete |
 | ADAPT-04 | Phase 2 | Pending |
 | ADAPT-05 | Phase 2 | Pending |
 | ADAPT-06 | Phase 1 | Complete |
 | EXP-01 | Phase 1 | Complete |
 | EXP-02 | Phase 1 | Complete |
 | EXP-03 | Phase 1 | Complete |
-| EXP-04 | Phase 2 | Pending |
-| EXP-05 | Phase 2 | Pending |
+| EXP-04 | Phase 2 | Complete |
+| EXP-05 | Phase 2 | Complete |
 | PAY-01 | Phase 1 | Complete |
 | PAY-02 | Phase 1 | Complete |
 | PAY-03 | Phase 1 | Complete |

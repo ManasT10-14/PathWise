@@ -10,6 +10,7 @@ import '../theme/glass_card.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton_loader.dart';
 import 'consultation_detail_screen.dart';
+import 'expert_annotation_screen.dart';
 
 class ExpertHomeScreen extends StatelessWidget {
   const ExpertHomeScreen({super.key, required this.appUser});
@@ -167,7 +168,45 @@ class ExpertHomeScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          Icon(Icons.chevron_right, color: colorScheme.outline),
+                          c.status == 'completed'
+                              ? Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.chevron_right, color: colorScheme.outline),
+                                    const SizedBox(height: 4),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Per EXP-04: pass roadmapId=c.consultationId (backend looks up
+                                        // user's active roadmap via userId), learnerId=c.userId.
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute<void>(
+                                            builder: (_) => ExpertAnnotationScreen(
+                                              roadmapId: c.consultationId,
+                                              learnerId: c.userId,
+                                              consultationId: c.id,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: colorScheme.primaryContainer,
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          'Annotate',
+                                          style: TextStyle(
+                                            color: colorScheme.onPrimaryContainer,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : Icon(Icons.chevron_right, color: colorScheme.outline),
                         ],
                       ),
                     ).animate().fadeIn(delay: (i * 80).ms).slideY(begin: 0.05, end: 0),

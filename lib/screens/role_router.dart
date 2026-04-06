@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import '../models/app_user.dart';
 import '../providers/app_services.dart';
+import '../widgets/skeleton_loader.dart';
 import 'admin_dashboard_screen.dart';
 import 'expert_home_screen.dart';
 import 'user_main_shell.dart';
@@ -18,11 +20,19 @@ class RoleRouter extends StatelessWidget {
       stream: repo.watchUser(firebaseUser.uid),
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(
+            body: Center(
+              child: SkeletonLoader(lines: 2, hasAvatar: true),
+            ),
+          );
         }
         final appUser = snap.data;
         if (appUser == null) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(
+            body: Center(
+              child: SkeletonLoader(lines: 2, hasAvatar: true),
+            ),
+          );
         }
         switch (appUser.role) {
           case UserRole.admin:

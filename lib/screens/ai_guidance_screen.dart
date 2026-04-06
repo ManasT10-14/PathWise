@@ -2,9 +2,13 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../models/app_user.dart';
 import '../providers/app_services.dart';
+import '../theme/glass_card.dart';
+import '../theme/gradient_background.dart';
+import '../widgets/ai_progress_indicator.dart';
 import 'roadmap_detail_screen.dart';
 
 class AiGuidanceScreen extends StatefulWidget {
@@ -24,6 +28,21 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
   final List<String> _skills = [];
   final List<String> _interests = [];
   bool _working = false;
+  int _aiStep = 0;
+
+  final _pageController = PageController();
+  int _currentPage = 0;
+
+  static const _stepLabels = ['Goals', 'Skills', 'Resume', 'Interests'];
+
+  @override
+  void initState() {
+    super.initState();
+    _goalsCtrl.text = widget.appUser.careerGoals;
+    _skills.addAll(widget.appUser.skills);
+    _interests.addAll(widget.appUser.interests);
+    _resumeCtrl.text = widget.appUser.resume;
+  }
 
   @override
   void dispose() {
@@ -31,6 +50,7 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
     _goalsCtrl.dispose();
     _skillCtrl.dispose();
     _interestCtrl.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -72,25 +92,58 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
     });
   }
 
+  void _nextStep() {
+    if (_currentPage < 3) {
+      setState(() => _currentPage++);
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _generate();
+    }
+  }
+
+  void _previousStep() {
+    if (_currentPage > 0) {
+      setState(() => _currentPage--);
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
   Future<void> _generate() async {
     final resume = _resumeCtrl.text.trim();
     final goals = _goalsCtrl.text.trim();
     if (resume.isEmpty && _skills.isEmpty && goals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add résumé text, skills, or career goals so the AI module can analyze gaps.')),
+        const SnackBar(content: Text('Add résumé text, skills, or career goals so the AI can analyze gaps.')),
       );
       return;
     }
 
-    setState(() => _working = true);
+    setState(() {
+      _working = true;
+      _aiStep = 0;
+    });
+
     try {
+      // Simulate step progression during analysis
       final svc = context.svc;
+
+      setState(() => _aiStep = 1);
       final analysis = svc.ai.analyze(
         resumeText: resume,
-        userSkills: [..._skills, ...widget.appUser.skills],
-        interests: [..._interests, ...widget.appUser.interests],
+        userSkills: _skills,
+        interests: _interests,
         careerGoals: goals.isEmpty ? widget.appUser.careerGoals : goals,
       );
+
+      setState(() => _aiStep = 2);
       final id = await svc.roadmaps.createFromAnalysis(
         userId: widget.appUser.uid,
         targetRole: analysis.targetRole,
@@ -98,6 +151,9 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
         resources: analysis.resources,
         timeline: analysis.timeline,
       );
+
+      setState(() => _aiStep = 3);
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Roadmap saved (extracted ${analysis.extractedSkills.length} skills)')),
@@ -115,99 +171,313 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    if (_working) {
+      return Scaffold(
+        body: GradientBackground(
+          variant: GradientVariant.secondary,
+          child: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Generating your roadmap...',
+                      style: theme.textTheme.headlineSmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    AiProgressIndicator(currentStep: _aiStep),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('AI guidance')),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(
-            'Résumé',
-            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _resumeCtrl,
-            minLines: 4,
-            maxLines: 10,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Paste résumé text or upload a .txt file',
-            ),
-          ),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _pickResumeFile,
-            icon: const Icon(Icons.upload_file),
-            label: const Text('Upload plain text (.txt / .md)'),
-          ),
-          const SizedBox(height: 20),
-          Text('Skills', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Row(
+      appBar: AppBar(title: const Text('AI Guidance')),
+      body: GradientBackground(
+        variant: GradientVariant.secondary,
+        child: SafeArea(
+          child: Column(
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _skillCtrl,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Add a skill',
-                  ),
-                  onSubmitted: (_) => _addSkill(),
+              // Progress indicator header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                child: _StepProgressBar(
+                  currentStep: _currentPage,
+                  stepLabels: _stepLabels,
                 ),
               ),
-              const SizedBox(width: 8),
-              FilledButton(onPressed: _addSkill, child: const Text('Add')),
-            ],
-          ),
-          Wrap(
-            spacing: 8,
-            children: _skills.map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _skills.remove(s)))).toList(),
-          ),
-          const SizedBox(height: 16),
-          Text('Interests', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Row(
-            children: [
+              const SizedBox(height: 16),
+              // Page view content
               Expanded(
-                child: TextField(
-                  controller: _interestCtrl,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Interest area',
-                  ),
-                  onSubmitted: (_) => _addInterest(),
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _StepPage(
+                      title: 'Career Goals',
+                      subtitle: 'What do you want to achieve in your career?',
+                      child: TextField(
+                        controller: _goalsCtrl,
+                        minLines: 3,
+                        maxLines: 6,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'e.g. Become an ML engineer in fintech',
+                          labelText: 'Career goals',
+                        ),
+                      ),
+                    ),
+                    _StepPage(
+                      title: 'Your Skills',
+                      subtitle: 'What skills do you currently have?',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _skillCtrl,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Add a skill',
+                                  ),
+                                  onSubmitted: (_) => _addSkill(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton(onPressed: _addSkill, child: const Text('Add')),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (_skills.isNotEmpty)
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: _skills
+                                  .map(
+                                    (s) => Chip(
+                                      label: Text(s),
+                                      onDeleted: () => setState(() => _skills.remove(s)),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                        ],
+                      ),
+                    ),
+                    _StepPage(
+                      title: 'Resume',
+                      subtitle: 'Paste your résumé or upload a text file.',
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _resumeCtrl,
+                            minLines: 4,
+                            maxLines: 10,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: 'Paste résumé text or upload a .txt file',
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _pickResumeFile,
+                              icon: const Icon(Icons.upload_file),
+                              label: const Text('Upload plain text (.txt / .md)'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    _StepPage(
+                      title: 'Interests',
+                      subtitle: 'What topics or domains interest you?',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _interestCtrl,
+                                  decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Interest area',
+                                  ),
+                                  onSubmitted: (_) => _addInterest(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              FilledButton(onPressed: _addInterest, child: const Text('Add')),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (_interests.isNotEmpty)
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
+                              children: _interests
+                                  .map(
+                                    (s) => Chip(
+                                      label: Text(s),
+                                      onDeleted: () => setState(() => _interests.remove(s)),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              FilledButton(onPressed: _addInterest, child: const Text('Add')),
+              // Navigation buttons
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                child: Row(
+                  children: [
+                    if (_currentPage > 0)
+                      OutlinedButton(
+                        onPressed: _previousStep,
+                        child: const Text('Back'),
+                      ),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: _nextStep,
+                      child: Text(
+                        _currentPage == 3 ? 'Generate Roadmap' : 'Next',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          Wrap(
-            spacing: 8,
-            children: _interests
-                .map((s) => Chip(label: Text(s), onDeleted: () => setState(() => _interests.remove(s))))
-                .toList(),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _goalsCtrl,
-            minLines: 2,
-            maxLines: 4,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Career goals',
-              hintText: 'e.g. Become an ML engineer in fintech',
-            ),
-          ),
-          const SizedBox(height: 24),
-          FilledButton(
-            onPressed: _working ? null : _generate,
-            child: _working
-                ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Text('Analyze & generate roadmap'),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+}
+
+class _StepProgressBar extends StatelessWidget {
+  const _StepProgressBar({
+    required this.currentStep,
+    required this.stepLabels,
+  });
+
+  final int currentStep;
+  final List<String> stepLabels;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        Row(
+          children: List.generate(stepLabels.length * 2 - 1, (i) {
+            if (i.isOdd) {
+              final stepIdx = i ~/ 2;
+              return Expanded(
+                child: Container(
+                  height: 2,
+                  color: stepIdx < currentStep
+                      ? Colors.green
+                      : colorScheme.outline.withOpacity(0.3),
+                ),
+              );
+            }
+            final stepIdx = i ~/ 2;
+            final isCompleted = stepIdx < currentStep;
+            final isActive = stepIdx == currentStep;
+
+            return CircleAvatar(
+              radius: 16,
+              backgroundColor: isCompleted
+                  ? Colors.green
+                  : isActive
+                      ? colorScheme.primary
+                      : colorScheme.outline.withOpacity(0.3),
+              child: isCompleted
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  : Text(
+                      '${stepIdx + 1}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isActive ? colorScheme.onPrimary : colorScheme.onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            );
+          }),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: stepLabels
+              .map(
+                (label) => Text(
+                  label,
+                  style: textTheme.labelSmall,
+                ),
+              )
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _StepPage extends StatelessWidget {
+  const _StepPage({
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      child: GlassCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 20),
+            child,
+          ],
+        ),
+      ).animate().fadeIn(duration: 300.ms).slideX(begin: 0.05, end: 0),
     );
   }
 }

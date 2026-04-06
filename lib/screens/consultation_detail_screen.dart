@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../models/app_user.dart';
 import '../models/consultation.dart';
@@ -30,11 +32,104 @@ class ConsultationDetailScreen extends StatefulWidget {
 
 class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
   final _payment = PaymentShell();
+  bool _creatingOrder = false;
+
+  // Holds the server-issued order ID while payment is in progress.
+  String? _pendingOrderId;
 
   @override
   void dispose() {
     _payment.dispose();
     super.dispose();
+  }
+
+  /// Initiates the server-side Razorpay order creation and opens checkout.
+  Future<void> _startPayment(Consultation c) async {
+    if (_creatingOrder) return;
+
+    final svc = context.svc;
+
+    setState(() => _creatingOrder = true);
+
+    try {
+      // PAY-01: Server creates the order — price comes from Firestore.
+      final order = await svc.api.createPaymentOrder(
+        consultationId: c.id,
+      );
+
+      final orderId = order['order_id']?.toString() ?? '';
+      final amount = order['amount'];
+
+      if (orderId.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not create payment order. Please try again.')),
+          );
+        }
+        return;
+      }
+
+      _pendingOrderId = orderId;
+
+      // Open Razorpay checkout with the server-provided order ID.
+      _payment.startWithOrder(
+        context: context,
+        payments: svc.payments,
+        orderId: orderId,
+        amountPaise: amount is num ? amount.toInt() : (c.price * 100).toInt(),
+        title: 'Consultation ${c.id}',
+        email: widget.appUser.email,
+        onSuccess: (paymentId, signature) async {
+          await _verifyPayment(
+            orderId: orderId,
+            paymentId: paymentId,
+            signature: signature,
+          );
+        },
+        onFailure: (msg) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Payment failed or cancelled: $msg')),
+            );
+          }
+        },
+      );
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Order creation failed: ${e.message ?? 'Unknown error'}')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _creatingOrder = false);
+    }
+  }
+
+  /// PAY-02: Verify Razorpay signature on the server after payment success.
+  Future<void> _verifyPayment({
+    required String orderId,
+    required String paymentId,
+    required String signature,
+  }) async {
+    try {
+      await context.svc.api.verifyPayment(
+        orderId: orderId,
+        paymentId: paymentId,
+        signature: signature,
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment verified successfully. Consultation confirmed.')),
+        );
+      }
+      // Server handles consultation status update — no client-side write.
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment verification failed: ${e.message ?? 'Unknown error'}')),
+        );
+      }
+    }
   }
 
   Color _statusColor(String status, ColorScheme colorScheme) {
@@ -175,31 +270,14 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: FilledButton(
-                              onPressed: () {
-                                _payment.start(
-                                  context: context,
-                                  payments: svc.payments,
-                                  amountPaise: (c.price).toInt() * 100,
-                                  title: 'Consultation ${c.id}',
-                                  email: widget.appUser.email,
-                                  onSuccess: (paymentId) async {
-                                    await svc.consultations.updateStatus(c.id, 'accepted');
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Payment OK ($paymentId). Session accepted.')),
-                                      );
-                                    }
-                                  },
-                                  onFailure: (msg) {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Payment failed or cancelled: $msg')),
-                                      );
-                                    }
-                                  },
-                                );
-                              },
-                              child: const Text('Pay with Razorpay'),
+                              onPressed: _creatingOrder ? null : () => _startPayment(c),
+                              child: _creatingOrder
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                    )
+                                  : const Text('Pay with Razorpay'),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -291,36 +369,86 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
+/// Thin wrapper around [PaymentService] that adds guard against double-taps
+/// and supports the server-side order flow (PAY-01).
 class PaymentShell {
   PaymentShell();
 
   bool _busy = false;
+  final Razorpay _razorpay = Razorpay();
+  void Function(String, String)? _onSuccess;
+  void Function(String)? _onFailure;
 
-  void dispose() {}
+  void _init() {
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handleSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handleError);
+  }
 
-  void start({
+  void dispose() {
+    _razorpay.clear();
+  }
+
+  /// Opens Razorpay checkout with a server-issued [orderId].
+  ///
+  /// The [orderId] must come from the backend's create-order endpoint so that
+  /// the amount is server-authoritative (PAY-01 anti-tampering).
+  void startWithOrder({
     required BuildContext context,
     required PaymentService payments,
+    required String orderId,
     required num amountPaise,
     required String title,
     String? email,
-    required void Function(String paymentId) onSuccess,
+    required void Function(String paymentId, String signature) onSuccess,
     required void Function(String message) onFailure,
   }) {
     if (_busy) return;
     _busy = true;
-    payments.payConsultation(
-      amountPaise: amountPaise,
-      orderTitle: title,
-      userEmail: email,
-      onSuccess: (id) {
-        _busy = false;
-        onSuccess(id);
+    _onSuccess = onSuccess;
+    _onFailure = onFailure;
+    _init();
+
+    final key = PaymentService.apiKey;
+    if (key.contains('PLACEHOLDER')) {
+      _busy = false;
+      onFailure('Razorpay key not set. Use --dart-define=RAZORPAY_KEY=rzp_test_xxx');
+      return;
+    }
+
+    final options = <String, dynamic>{
+      'key': key,
+      'amount': amountPaise,
+      'order_id': orderId,
+      'name': 'Pathwise',
+      'description': title,
+      'prefill': {
+        if (email != null && email.isNotEmpty) 'email': email,
       },
-      onFailure: (m) {
-        _busy = false;
-        onFailure(m);
-      },
-    );
+      'external': {'wallets': ['paytm']},
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      _busy = false;
+      onFailure(e.toString());
+    }
+  }
+
+  void _handleSuccess(PaymentSuccessResponse r) {
+    _busy = false;
+    _onSuccess?.call(r.paymentId ?? '', r.signature ?? '');
+    _clearCallbacks();
+  }
+
+  void _handleError(PaymentFailureResponse r) {
+    _busy = false;
+    _onFailure?.call(r.message ?? 'Payment failed');
+    _clearCallbacks();
+  }
+
+  void _clearCallbacks() {
+    _onSuccess = null;
+    _onFailure = null;
   }
 }

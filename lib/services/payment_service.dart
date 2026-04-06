@@ -22,6 +22,10 @@ class PaymentService {
     return 'rzp_test_PLACEHOLDER_REPLACE';
   }
 
+  /// Public accessor used by [PaymentShell] in consultation_detail_screen.dart
+  /// to open Razorpay with a server-issued order ID.
+  static String get apiKey => _key;
+
   void dispose() {
     _razorpay.clear();
   }

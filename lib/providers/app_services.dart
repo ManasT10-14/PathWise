@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import '../services/ai_roadmap_service.dart';
+import '../services/api_client.dart';
 import '../services/auth_service.dart';
 import '../services/consultation_repository.dart';
 import '../services/expert_repository.dart';
@@ -20,6 +21,7 @@ class AppServices extends InheritedWidget {
     required this.reviews,
     required this.ai,
     required this.payments,
+    required this.api,
     required super.child,
   });
 
@@ -31,6 +33,7 @@ class AppServices extends InheritedWidget {
   final ReviewRepository reviews;
   final AiRoadmapService ai;
   final PaymentService payments;
+  final ApiClient api;
 
   static AppServices of(BuildContext context) {
     final s = context.dependOnInheritedWidgetOfExactType<AppServices>();
@@ -47,7 +50,8 @@ class AppServices extends InheritedWidget {
       roadmaps != oldWidget.roadmaps ||
       reviews != oldWidget.reviews ||
       ai != oldWidget.ai ||
-      payments != oldWidget.payments;
+      payments != oldWidget.payments ||
+      api != oldWidget.api;
 }
 
 extension AppServicesX on BuildContext {

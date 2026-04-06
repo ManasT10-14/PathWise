@@ -8,6 +8,7 @@ import 'providers/app_services.dart';
 import 'screens/login_screen.dart';
 import 'screens/role_router.dart';
 import 'services/ai_roadmap_service.dart';
+import 'services/api_client.dart';
 import 'services/auth_service.dart';
 import 'services/consultation_repository.dart';
 import 'services/expert_repository.dart';
@@ -41,6 +42,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
   late final ReviewRepository _reviews;
   late final AiRoadmapService _ai;
   late final PaymentService _payments;
+  late final ApiClient _api;
 
   @override
   void initState() {
@@ -53,6 +55,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
     _reviews = ReviewRepository(expertRepository: _experts);
     _ai = AiRoadmapService();
     _payments = PaymentService();
+    _api = ApiClient();
   }
 
   @override
@@ -73,6 +76,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
         Provider.value(value: _reviews),
         Provider.value(value: _ai),
         Provider.value(value: _payments),
+        Provider.value(value: _api),
       ],
       child: AppServices(
         auth: _auth,
@@ -83,6 +87,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
         reviews: _reviews,
         ai: _ai,
         payments: _payments,
+        api: _api,
         child: ValueListenableBuilder<ThemeMode>(
           valueListenable: themeMode,
           builder: (context, mode, _) => MaterialApp(

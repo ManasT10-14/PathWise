@@ -13,7 +13,7 @@ Pathwise transforms from a functional prototype with keyword-matching AI and sto
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Full Platform Overhaul** - AI backend, UI transformation, payments, security, marketplace, and admin -- the entire production-ready core (completed 2026-04-06)
-- [ ] **Phase 2: Adaptive Intelligence** - Dynamic replanning, learner memory, expert-AI feedback loop -- the features that make roadmaps evolve
+- [x] **Phase 2: Adaptive Intelligence** - Dynamic replanning, learner memory, expert-AI feedback loop -- the features that make roadmaps evolve (completed 2026-04-06)
 
 ## Phase Details
 
@@ -46,7 +46,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Backend: replan endpoint, learner memory subcollection, memory-aware prompt chain, roadmap versioning
+- [x] 02-01-PLAN.md — Backend: replan endpoint, learner memory subcollection, memory-aware prompt chain, roadmap versioning
 - [x] 02-02-PLAN.md — Frontend: replan trigger UI in roadmap screen, expert annotation interface, annotation display, wire to backend
 
 ## Progress
@@ -57,4 +57,4 @@ Phases execute in numeric order: 1 -> 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Full Platform Overhaul | 3/3 | Complete   | 2026-04-06 |
-| 2. Adaptive Intelligence | 1/2 | In Progress|  |
+| 2. Adaptive Intelligence | 2/2 | Complete   | 2026-04-06 |

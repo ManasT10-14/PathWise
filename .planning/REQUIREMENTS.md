@@ -36,8 +36,8 @@
 - [x] **ADAPT-01**: Dynamic replanning triggers when stageProgress unchanged for 14+ days on any milestone
 - [x] **ADAPT-02**: Replan endpoint accepts current progress + optional learner feedback and generates adjusted roadmap
 - [x] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason -- history preserved, not overwritten
-- [ ] **ADAPT-04**: Learner memory subcollection stores analysis history, struggle patterns, and pace trends
-- [ ] **ADAPT-05**: Memory context included in replan and subsequent analysis prompts for continuity
+- [x] **ADAPT-04**: Learner memory subcollection stores analysis history, struggle patterns, and pace trends
+- [x] **ADAPT-05**: Memory context included in replan and subsequent analysis prompts for continuity
 - [x] **ADAPT-06**: Confidence scores displayed as colored badges next to each skill gap
 
 ### Expert Marketplace
@@ -128,8 +128,8 @@
 | ADAPT-01 | Phase 2 | Complete |
 | ADAPT-02 | Phase 2 | Complete |
 | ADAPT-03 | Phase 2 | Complete |
-| ADAPT-04 | Phase 2 | Pending |
-| ADAPT-05 | Phase 2 | Pending |
+| ADAPT-04 | Phase 2 | Complete |
+| ADAPT-05 | Phase 2 | Complete |
 | ADAPT-06 | Phase 1 | Complete |
 | EXP-01 | Phase 1 | Complete |
 | EXP-02 | Phase 1 | Complete |

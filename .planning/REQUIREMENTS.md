@@ -35,7 +35,7 @@
 
 - [ ] **ADAPT-01**: Dynamic replanning triggers when stageProgress unchanged for 14+ days on any milestone
 - [ ] **ADAPT-02**: Replan endpoint accepts current progress + optional learner feedback and generates adjusted roadmap
-- [ ] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason — history preserved, not overwritten
+- [ ] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason -- history preserved, not overwritten
 - [ ] **ADAPT-04**: Learner memory subcollection stores analysis history, struggle patterns, and pace trends
 - [ ] **ADAPT-05**: Memory context included in replan and subsequent analysis prompts for continuity
 - [ ] **ADAPT-06**: Confidence scores displayed as colored badges next to each skill gap
@@ -45,7 +45,7 @@
 - [ ] **EXP-01**: Expert discovery with search, domain filter, price range, rating filter, and sort
 - [ ] **EXP-02**: Expert profile shows full skill list, experience, reviews, and AI-generated learner context during consultations
 - [ ] **EXP-03**: Consultation booking flow polished with clear type selection, scheduling, and pricing
-- [ ] **EXP-04**: Expert annotation interface — experts can add comments to learner roadmap milestones
+- [ ] **EXP-04**: Expert annotation interface -- experts can add comments to learner roadmap milestones
 - [ ] **EXP-05**: Expert annotations stored and fed into AI replan prompts (expert-AI feedback loop)
 
 ### Payment Hardening
@@ -60,7 +60,7 @@
 - [ ] **SEC-01**: Firebase security rules deployed for all 5 collections (users, experts, consultations, roadmaps, reviews)
 - [ ] **SEC-02**: FastAPI auth middleware verifies Firebase ID token on every request
 - [ ] **SEC-03**: Input sanitization on all AI endpoints (strip control characters, enforce length limits)
-- [ ] **SEC-04**: Resume text and career goals treated as PII — never logged in full
+- [ ] **SEC-04**: Resume text and career goals treated as PII -- never logged in full
 
 ### Admin
 
@@ -149,10 +149,12 @@
 | ADM-03 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 43 total
-- Mapped to phases: 43
+- v1 requirements: 42 total
+- Phase 1: 35 requirements
+- Phase 2: 7 requirements
+- Mapped to phases: 42
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-07*
-*Last updated: 2026-04-07 after initial definition*
+*Last updated: 2026-04-07 after roadmap creation*

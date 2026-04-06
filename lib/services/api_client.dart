@@ -132,4 +132,72 @@ class ApiClient {
     );
     return response.data ?? {};
   }
+
+  // ---------------------------------------------------------------------------
+  // Adaptive Replanning (ADAPT-02)
+  // ---------------------------------------------------------------------------
+
+  /// POST /api/v1/roadmaps/replan
+  ///
+  /// Requests an AI-generated adjusted roadmap based on progress stall or
+  /// explicit learner feedback. Rate limited to 3 replans per day (AI-10).
+  ///
+  /// Returns:
+  /// ```json
+  /// {
+  ///   "new_roadmap_id": "...",
+  ///   "replan_reason": "...",
+  ///   "adjusted_milestones": [...],
+  ///   "stalled_stages": [...],
+  ///   "version": 2
+  /// }
+  /// ```
+  Future<Map<String, dynamic>> replanRoadmap({
+    required String roadmapId,
+    required Map<String, double> currentProgress,
+    String learnerFeedback = '',
+    int? stallDays,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/roadmaps/replan',
+      data: {
+        'roadmap_id': roadmapId,
+        'current_progress': currentProgress,
+        'learner_feedback': learnerFeedback,
+        if (stallDays != null) 'stall_days': stallDays,
+      },
+    );
+    return response.data ?? {};
+  }
+
+  // ---------------------------------------------------------------------------
+  // Expert Annotations (EXP-04, EXP-05)
+  // ---------------------------------------------------------------------------
+
+  /// POST /api/v1/roadmaps/annotate
+  ///
+  /// Stores an expert annotation for a specific milestone on a learner's roadmap.
+  /// Annotations are fed into future AI replans (EXP-05).
+  ///
+  /// Returns:
+  /// ```json
+  /// { "status": "ok" }
+  /// ```
+  Future<Map<String, dynamic>> submitExpertAnnotation({
+    required String roadmapId,
+    required String userId,
+    required String milestoneLevel,
+    required String annotation,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      '/api/v1/roadmaps/annotate',
+      data: {
+        'roadmap_id': roadmapId,
+        'user_id': userId,
+        'milestone_level': milestoneLevel,
+        'annotation': annotation,
+      },
+    );
+    return response.data ?? {};
+  }
 }

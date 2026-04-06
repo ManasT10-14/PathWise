@@ -21,6 +21,9 @@ class Roadmap {
     required this.createdAt,
     required this.updatedAt,
     this.stageProgress = const {},
+    this.replanVersion,
+    this.replanReason,
+    this.previousRoadmapId,
   });
 
   final String id;
@@ -33,6 +36,31 @@ class Roadmap {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, double> stageProgress;
+
+  /// Version number incremented on each replan (ADAPT-03).
+  final int? replanVersion;
+
+  /// AI-generated explanation of why the roadmap was replanned (ADAPT-03).
+  final String? replanReason;
+
+  /// Firestore ID of the previous roadmap document, if this is a replanned version.
+  final String? previousRoadmapId;
+
+  /// Returns true if any stage has been at < 1.0 progress and updatedAt
+  /// is more than [thresholdDays] days ago (default 14 — ADAPT-01).
+  bool isStalled({int thresholdDays = 14}) {
+    if (updatedAt == null) return false;
+    final daysSinceUpdate = DateTime.now().difference(updatedAt!).inDays;
+    if (daysSinceUpdate < thresholdDays) return false;
+    // Check that at least one stage is incomplete
+    return stageProgress.values.any((p) => p < 1.0);
+  }
+
+  /// Returns day count since last progress update, or null if updatedAt missing.
+  int? daysSinceUpdate() {
+    if (updatedAt == null) return null;
+    return DateTime.now().difference(updatedAt!).inDays;
+  }
 
   List<RoadmapStage> get structuredStages {
     final stages = <RoadmapStage>[];
@@ -86,6 +114,9 @@ class Roadmap {
       createdAt: ts(m['createdAt']),
       updatedAt: ts(m['updatedAt']),
       stageProgress: progress,
+      replanVersion: m['replan_version'] is int ? m['replan_version'] as int : null,
+      replanReason: m['replan_reason']?.toString(),
+      previousRoadmapId: m['previous_roadmap_id']?.toString(),
     );
   }
 
@@ -100,10 +131,19 @@ class Roadmap {
       'stageProgress': stageProgress.map((k, v) => MapEntry(k, v)),
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
+      if (replanVersion != null) 'replan_version': replanVersion,
+      if (replanReason != null) 'replan_reason': replanReason,
+      if (previousRoadmapId != null) 'previous_roadmap_id': previousRoadmapId,
     };
   }
 
-  Roadmap copyWith({Map<String, double>? stageProgress, DateTime? updatedAt}) {
+  Roadmap copyWith({
+    Map<String, double>? stageProgress,
+    DateTime? updatedAt,
+    int? replanVersion,
+    String? replanReason,
+    String? previousRoadmapId,
+  }) {
     return Roadmap(
       id: id,
       roadmapId: roadmapId,
@@ -115,6 +155,9 @@ class Roadmap {
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       stageProgress: stageProgress ?? this.stageProgress,
+      replanVersion: replanVersion ?? this.replanVersion,
+      replanReason: replanReason ?? this.replanReason,
+      previousRoadmapId: previousRoadmapId ?? this.previousRoadmapId,
     );
   }
 }

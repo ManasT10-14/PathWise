@@ -94,6 +94,7 @@ class _RoadmapBody extends StatefulWidget {
 
 class _RoadmapBodyState extends State<_RoadmapBody> {
   late Map<String, double> _progress;
+  bool _isReplanning = false;
 
   @override
   void initState() {
@@ -136,6 +137,85 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
       (sum, s) => sum + (_progress[s.level] ?? 0.0),
     );
     return total / stages.length;
+  }
+
+  Future<void> _triggerReplan({String feedback = ''}) async {
+    final apiClient = context.svc.api;
+    setState(() => _isReplanning = true);
+
+    try {
+      final stallDays = widget.roadmap.daysSinceUpdate();
+      final result = await apiClient.replanRoadmap(
+        roadmapId: widget.roadmap.id,
+        currentProgress: _progress,
+        learnerFeedback: feedback,
+        stallDays: stallDays,
+      );
+
+      final newRoadmapId = result['new_roadmap_id'] as String?;
+      if (newRoadmapId != null && mounted) {
+        // Navigate to the new versioned roadmap document
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute<void>(
+            builder: (_) => RoadmapDetailScreen(roadmapId: newRoadmapId),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Replan failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isReplanning = false);
+    }
+  }
+
+  Future<void> _showReplanDialog() async {
+    final feedbackController = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Replan Your Roadmap'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'The AI will generate an adjusted roadmap based on your progress. '
+              'Optionally tell us what you\'re struggling with:',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: feedbackController,
+              maxLines: 3,
+              maxLength: 500,
+              decoration: const InputDecoration(
+                hintText: 'e.g. "I find the math in ML difficult..."',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _triggerReplan(feedback: feedbackController.text);
+            },
+            child: const Text('Replan'),
+          ),
+        ],
+      ),
+    );
+    feedbackController.dispose();
   }
 
   @override
@@ -217,6 +297,41 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
             ),
           ),
 
+          // Replan version banner (shown on replanned roadmaps — ADAPT-03)
+          if (widget.roadmap.replanReason != null) ...[
+            const SizedBox(height: 12),
+            GlassCard(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.auto_fix_high, color: colorScheme.primary, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Version ${widget.roadmap.replanVersion ?? 2} — Adapted for you',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.roadmap.replanReason!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurface.withOpacity(0.8),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0),
+          ],
+
           // Skill gaps section (progressive enhancement)
           if (widget.skillGaps != null && widget.skillGaps!.isNotEmpty) ...[
             const SizedBox(height: 16),
@@ -241,6 +356,53 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                 ],
               ),
             ),
+          ],
+
+          // Replan trigger (shown when roadmap is stalled — ADAPT-01)
+          if (widget.roadmap.isStalled()) ...[
+            const SizedBox(height: 12),
+            GlassCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Progress stalled for ${widget.roadmap.daysSinceUpdate()} days',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: Colors.orange.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Your roadmap can be adjusted to better match your current pace.',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _isReplanning ? null : _showReplanDialog,
+                      icon: _isReplanning
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.auto_fix_high, size: 18),
+                      label: Text(_isReplanning ? 'Replanning...' : 'Replan Roadmap'),
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.05, end: 0),
           ],
 
           const SizedBox(height: 20),

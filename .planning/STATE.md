@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-02-PLAN.md (UI overhaul)
-last_updated: "2026-04-06T20:43:57.514Z"
+status: verifying
+stopped_at: Completed 01-03-PLAN.md (Integration, Payments, Security & Admin)
+last_updated: "2026-04-06T20:56:26.424Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 
 Phase: 01 (full-platform-overhaul) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-06
 
 Progress: [░░░░░░░░░░] 0%
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-full-platform-overhaul P01 | 8 | 6 tasks | 24 files |
 | Phase 01-full-platform-overhaul P02 | 9 | 10 tasks | 25 files |
+| Phase 01-full-platform-overhaul P03 | 8 | 8 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,10 @@ Recent decisions affecting current work:
 - [Phase 01-full-platform-overhaul]: Per-user rate limiting by Firebase UID (not IP) to prevent shared-NAT unfairness
 - [Phase 01-full-platform-overhaul]: GlassCard via BackdropFilter+ClipRRect+RepaintBoundary (no external glassmorphism package — all unmaintained)
 - [Phase 01-full-platform-overhaul]: themeMode as top-level ValueNotifier<ThemeMode> global for cross-screen dark mode toggle
+- [Phase 01-full-platform-overhaul]: Dio InterceptorsWrapper for Firebase token injection — clean separation from business logic
+- [Phase 01-full-platform-overhaul]: Payment amount always read from Firestore server-side — client never trusted for price (anti-tampering)
+- [Phase 01-full-platform-overhaul]: VALID_TRANSITIONS dict state machine for idempotent payment status updates (pending->captured|failed, captured=terminal)
+- [Phase 01-full-platform-overhaul]: Webhook always returns 200 to Razorpay — prevents retry storms on business-logic failures
 
 ### Pending Todos
 
@@ -84,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T20:43:57.509Z
-Stopped at: Completed 01-02-PLAN.md (UI overhaul)
+Last session: 2026-04-06T20:56:26.418Z
+Stopped at: Completed 01-03-PLAN.md (Integration, Payments, Security & Admin)
 Resume file: None

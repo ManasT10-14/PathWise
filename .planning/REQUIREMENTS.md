@@ -27,7 +27,7 @@
 - [x] **AI-05**: Skill Gap Detector identifies missing skills with confidence scores (0-1), prerequisite ordering, and proficiency levels
 - [x] **AI-06**: Roadmap Planner generates multi-phase milestones with estimated hours, deadlines, and revision points
 - [x] **AI-07**: Resource Curator maps specific free resources (URLs, types, difficulty) to each milestone
-- [ ] **AI-08**: Flutter app replaces local AiRoadmapService with HTTP client calling FastAPI endpoints
+- [x] **AI-08**: Flutter app replaces local AiRoadmapService with HTTP client calling FastAPI endpoints
 - [x] **AI-09**: JSON validation layer with retry logic for malformed Gemini responses
 - [x] **AI-10**: Per-user rate limiting (max 10 analyses/day, 3 replans/day)
 
@@ -50,23 +50,23 @@
 
 ### Payment Hardening
 
-- [ ] **PAY-01**: Server-side Razorpay order creation via FastAPI endpoint
-- [ ] **PAY-02**: Payment signature verification on server before updating consultation status
-- [ ] **PAY-03**: Webhook handler for payment.captured event as backup confirmation
-- [ ] **PAY-04**: Idempotent payment status transitions (state machine, not direct assignment)
+- [x] **PAY-01**: Server-side Razorpay order creation via FastAPI endpoint
+- [x] **PAY-02**: Payment signature verification on server before updating consultation status
+- [x] **PAY-03**: Webhook handler for payment.captured event as backup confirmation
+- [x] **PAY-04**: Idempotent payment status transitions (state machine, not direct assignment)
 
 ### Security
 
-- [ ] **SEC-01**: Firebase security rules deployed for all 5 collections (users, experts, consultations, roadmaps, reviews)
+- [x] **SEC-01**: Firebase security rules deployed for all 5 collections (users, experts, consultations, roadmaps, reviews)
 - [x] **SEC-02**: FastAPI auth middleware verifies Firebase ID token on every request
 - [x] **SEC-03**: Input sanitization on all AI endpoints (strip control characters, enforce length limits)
 - [x] **SEC-04**: Resume text and career goals treated as PII -- never logged in full
 
 ### Admin
 
-- [ ] **ADM-01**: Admin dashboard shows platform analytics (total users, active roadmaps, consultations this week)
-- [ ] **ADM-02**: Expert verification workflow with approval/rejection actions
-- [ ] **ADM-03**: Review moderation with flagging and deletion capability
+- [x] **ADM-01**: Admin dashboard shows platform analytics (total users, active roadmaps, consultations this week)
+- [x] **ADM-02**: Expert verification workflow with approval/rejection actions
+- [x] **ADM-03**: Review moderation with flagging and deletion capability
 
 ## v2 Requirements
 
@@ -122,7 +122,7 @@
 | AI-05 | Phase 1 | Complete |
 | AI-06 | Phase 1 | Complete |
 | AI-07 | Phase 1 | Complete |
-| AI-08 | Phase 1 | Pending |
+| AI-08 | Phase 1 | Complete |
 | AI-09 | Phase 1 | Complete |
 | AI-10 | Phase 1 | Complete |
 | ADAPT-01 | Phase 2 | Pending |
@@ -136,17 +136,17 @@
 | EXP-03 | Phase 1 | Complete |
 | EXP-04 | Phase 2 | Pending |
 | EXP-05 | Phase 2 | Pending |
-| PAY-01 | Phase 1 | Pending |
-| PAY-02 | Phase 1 | Pending |
-| PAY-03 | Phase 1 | Pending |
-| PAY-04 | Phase 1 | Pending |
-| SEC-01 | Phase 1 | Pending |
+| PAY-01 | Phase 1 | Complete |
+| PAY-02 | Phase 1 | Complete |
+| PAY-03 | Phase 1 | Complete |
+| PAY-04 | Phase 1 | Complete |
+| SEC-01 | Phase 1 | Complete |
 | SEC-02 | Phase 1 | Complete |
 | SEC-03 | Phase 1 | Complete |
 | SEC-04 | Phase 1 | Complete |
-| ADM-01 | Phase 1 | Pending |
-| ADM-02 | Phase 1 | Pending |
-| ADM-03 | Phase 1 | Pending |
+| ADM-01 | Phase 1 | Complete |
+| ADM-02 | Phase 1 | Complete |
+| ADM-03 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 42 total

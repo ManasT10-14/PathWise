@@ -7,16 +7,16 @@
 
 ### UI Overhaul
 
-- [ ] **UI-01**: App uses glassmorphism design system with frosted glass cards, layered depth, and translucent surfaces via BackdropFilter
-- [ ] **UI-02**: Onboarding wizard is a multi-step conversational flow (goal, skills, resume, constraints) with progress indicator and animated transitions
-- [ ] **UI-03**: Dark mode and light mode supported with consistent color scheme across all screens
-- [ ] **UI-04**: Micro-interactions on all key actions: progress ring fill animations, card entrance animations, celebration burst on stage completion, spring-based button feedback
-- [ ] **UI-05**: Skeleton loading screens replace bare CircularProgressIndicator on all data-loading screens
-- [ ] **UI-06**: Roadmap displayed as vertical timeline with connected nodes, pulsing current position, milestone cards, and expandable task lists
-- [ ] **UI-07**: AI analysis shows animated 4-step progress storytelling ("Analyzing skills..." -> "Detecting gaps..." -> "Building roadmap..." -> "Curating resources...")
-- [ ] **UI-08**: Expert marketplace has domain filter chips, price range slider, rating threshold filter, and sort options
-- [ ] **UI-09**: All screens have polished error states with retry actions and empty states with helpful guidance
-- [ ] **UI-10**: Gradient mesh backgrounds behind glass cards on key screens (home, roadmap, expert profile)
+- [x] **UI-01**: App uses glassmorphism design system with frosted glass cards, layered depth, and translucent surfaces via BackdropFilter
+- [x] **UI-02**: Onboarding wizard is a multi-step conversational flow (goal, skills, resume, constraints) with progress indicator and animated transitions
+- [x] **UI-03**: Dark mode and light mode supported with consistent color scheme across all screens
+- [x] **UI-04**: Micro-interactions on all key actions: progress ring fill animations, card entrance animations, celebration burst on stage completion, spring-based button feedback
+- [x] **UI-05**: Skeleton loading screens replace bare CircularProgressIndicator on all data-loading screens
+- [x] **UI-06**: Roadmap displayed as vertical timeline with connected nodes, pulsing current position, milestone cards, and expandable task lists
+- [x] **UI-07**: AI analysis shows animated 4-step progress storytelling ("Analyzing skills..." -> "Detecting gaps..." -> "Building roadmap..." -> "Curating resources...")
+- [x] **UI-08**: Expert marketplace has domain filter chips, price range slider, rating threshold filter, and sort options
+- [x] **UI-09**: All screens have polished error states with retry actions and empty states with helpful guidance
+- [x] **UI-10**: Gradient mesh backgrounds behind glass cards on key screens (home, roadmap, expert profile)
 
 ### AI Backend
 
@@ -38,13 +38,13 @@
 - [ ] **ADAPT-03**: Replanned roadmaps are new versions with replan_reason -- history preserved, not overwritten
 - [ ] **ADAPT-04**: Learner memory subcollection stores analysis history, struggle patterns, and pace trends
 - [ ] **ADAPT-05**: Memory context included in replan and subsequent analysis prompts for continuity
-- [ ] **ADAPT-06**: Confidence scores displayed as colored badges next to each skill gap
+- [x] **ADAPT-06**: Confidence scores displayed as colored badges next to each skill gap
 
 ### Expert Marketplace
 
-- [ ] **EXP-01**: Expert discovery with search, domain filter, price range, rating filter, and sort
-- [ ] **EXP-02**: Expert profile shows full skill list, experience, reviews, and AI-generated learner context during consultations
-- [ ] **EXP-03**: Consultation booking flow polished with clear type selection, scheduling, and pricing
+- [x] **EXP-01**: Expert discovery with search, domain filter, price range, rating filter, and sort
+- [x] **EXP-02**: Expert profile shows full skill list, experience, reviews, and AI-generated learner context during consultations
+- [x] **EXP-03**: Consultation booking flow polished with clear type selection, scheduling, and pricing
 - [ ] **EXP-04**: Expert annotation interface -- experts can add comments to learner roadmap milestones
 - [ ] **EXP-05**: Expert annotations stored and fed into AI replan prompts (expert-AI feedback loop)
 
@@ -105,16 +105,16 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 1 | Pending |
-| UI-02 | Phase 1 | Pending |
-| UI-03 | Phase 1 | Pending |
-| UI-04 | Phase 1 | Pending |
-| UI-05 | Phase 1 | Pending |
-| UI-06 | Phase 1 | Pending |
-| UI-07 | Phase 1 | Pending |
-| UI-08 | Phase 1 | Pending |
-| UI-09 | Phase 1 | Pending |
-| UI-10 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Complete |
+| UI-02 | Phase 1 | Complete |
+| UI-03 | Phase 1 | Complete |
+| UI-04 | Phase 1 | Complete |
+| UI-05 | Phase 1 | Complete |
+| UI-06 | Phase 1 | Complete |
+| UI-07 | Phase 1 | Complete |
+| UI-08 | Phase 1 | Complete |
+| UI-09 | Phase 1 | Complete |
+| UI-10 | Phase 1 | Complete |
 | AI-01 | Phase 1 | Complete |
 | AI-02 | Phase 1 | Complete |
 | AI-03 | Phase 1 | Complete |
@@ -130,10 +130,10 @@
 | ADAPT-03 | Phase 2 | Pending |
 | ADAPT-04 | Phase 2 | Pending |
 | ADAPT-05 | Phase 2 | Pending |
-| ADAPT-06 | Phase 1 | Pending |
-| EXP-01 | Phase 1 | Pending |
-| EXP-02 | Phase 1 | Pending |
-| EXP-03 | Phase 1 | Pending |
+| ADAPT-06 | Phase 1 | Complete |
+| EXP-01 | Phase 1 | Complete |
+| EXP-02 | Phase 1 | Complete |
+| EXP-03 | Phase 1 | Complete |
 | EXP-04 | Phase 2 | Pending |
 | EXP-05 | Phase 2 | Pending |
 | PAY-01 | Phase 1 | Pending |

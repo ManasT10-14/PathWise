@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -131,39 +133,85 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
       _aiStep = 0;
     });
 
+    final svc = context.svc;
+    Timer? stepTimer;
+
     try {
-      // Simulate step progression during analysis
-      final svc = context.svc;
+      // Simulate the 4-step Gemini prompt chain progressing while the single
+      // HTTP call runs in the background.  Steps advance every 1.5 s; the
+      // response handler cancels the timer and jumps to step 4.
+      stepTimer = Timer.periodic(const Duration(milliseconds: 1500), (t) {
+        if (_aiStep < 3) {
+          if (mounted) setState(() => _aiStep++);
+        } else {
+          t.cancel();
+        }
+      });
 
-      setState(() => _aiStep = 1);
-      final analysis = svc.ai.analyze(
-        resumeText: resume,
-        userSkills: _skills,
-        interests: _interests,
-        careerGoals: goals.isEmpty ? widget.appUser.careerGoals : goals,
-      );
+      final effectiveGoals = goals.isEmpty ? widget.appUser.careerGoals : goals;
 
-      setState(() => _aiStep = 2);
-      final id = await svc.roadmaps.createFromAnalysis(
-        userId: widget.appUser.uid,
-        targetRole: analysis.targetRole,
-        milestones: analysis.milestones,
-        resources: analysis.resources,
-        timeline: analysis.timeline,
-      );
+      String? roadmapId;
 
-      setState(() => _aiStep = 3);
+      try {
+        // --- Primary path: FastAPI backend with Gemini 2.5 Flash ---
+        final result = await svc.api.analyzeCareer(
+          resumeText: resume,
+          skills: _skills,
+          interests: _interests,
+          careerGoals: effectiveGoals,
+        );
+
+        stepTimer.cancel();
+        if (mounted) setState(() => _aiStep = 4);
+
+        roadmapId = result['roadmap_id']?.toString();
+      } on DioException catch (e) {
+        // --- Fallback: local keyword-based AiRoadmapService ---
+        stepTimer.cancel();
+        debugPrint('ApiClient error, falling back to local AI: $e');
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Using offline analysis — connect to server for full AI analysis'),
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+
+        final analysis = svc.ai.analyze(
+          resumeText: resume,
+          userSkills: _skills,
+          interests: _interests,
+          careerGoals: effectiveGoals,
+        );
+
+        if (mounted) setState(() => _aiStep = 4);
+
+        roadmapId = await svc.roadmaps.createFromAnalysis(
+          userId: widget.appUser.uid,
+          targetRole: analysis.targetRole,
+          milestones: analysis.milestones,
+          resources: analysis.resources,
+          timeline: analysis.timeline,
+        );
+      }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Roadmap saved (extracted ${analysis.extractedSkills.length} skills)')),
-      );
+      if (roadmapId == null || roadmapId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Analysis complete — could not retrieve roadmap ID.')),
+        );
+        return;
+      }
+
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
-          builder: (_) => RoadmapDetailScreen(roadmapId: id),
+          builder: (_) => RoadmapDetailScreen(roadmapId: roadmapId!),
         ),
       );
     } finally {
+      stepTimer?.cancel();
       if (mounted) setState(() => _working = false);
     }
   }

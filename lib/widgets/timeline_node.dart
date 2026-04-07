@@ -44,22 +44,26 @@ class _TimelineNodeState extends State<TimelineNode> {
 
   /// Extracts a short display name from the milestone title.
   /// Gemini returns titles like "Beginner — Foundations for ML: core syntax..."
-  /// We take the part after the dash as the short name.
+  /// We take the part after the dash, or truncate to ~60 chars.
   String _shortTitle() {
     final raw = widget.stage.title;
-    // Try splitting on " — " or " -- " (Gemini uses both)
-    for (final sep in [' — ', ' -- ', ': ']) {
+    // Try splitting on common separators
+    for (final sep in [' — ', ' -- ', ' - ']) {
       final idx = raw.indexOf(sep);
       if (idx > 0 && idx < raw.length - sep.length) {
-        return raw.substring(idx + sep.length).trim();
+        final after = raw.substring(idx + sep.length).trim();
+        // If what's after is still long, take up to the first colon or period
+        final colonIdx = after.indexOf(':');
+        if (colonIdx > 0 && colonIdx < 60) return after.substring(0, colonIdx).trim();
+        final periodIdx = after.indexOf('.');
+        if (periodIdx > 0 && periodIdx < 60) return after.substring(0, periodIdx).trim();
+        if (after.length > 60) return '${after.substring(0, 57)}...';
+        return after;
       }
     }
+    // No separator found — truncate the raw title
+    if (raw.length > 60) return '${raw.substring(0, 57)}...';
     return raw;
-  }
-
-  /// Returns the full milestone description for the expanded view.
-  String _fullDescription() {
-    return widget.stage.title;
   }
 
   String _levelLabel() {

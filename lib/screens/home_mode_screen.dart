@@ -99,39 +99,8 @@ class HomeModeScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 32),
-
-            // Quick stats row
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickStat(
-                    index: 0,
-                    icon: Icons.school_rounded,
-                    label: 'Skills',
-                    value: '${appUser.skills.length}',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _QuickStat(
-                    index: 1,
-                    icon: Icons.interests_rounded,
-                    label: 'Interests',
-                    value: '${appUser.interests.length}',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _QuickStat(
-                    index: 2,
-                    icon: Icons.trending_up_rounded,
-                    label: 'Role',
-                    value: appUser.careerGoals.isNotEmpty ? 'Set' : '—',
-                  ),
-                ),
-              ],
-            ),
+            // Bottom padding so content doesn't hide behind the nav bar
+            const SizedBox(height: 80),
           ],
         ),
       ),
@@ -236,46 +205,3 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-class _QuickStat extends StatelessWidget {
-  const _QuickStat({
-    required this.index,
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final int index;
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return GlassCard(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-      child: Column(
-        children: [
-          Icon(icon, size: 20, color: AppTheme.accent.withOpacity(0.7)),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: isDark ? Colors.white.withOpacity(0.4) : Colors.black45,
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(delay: (index * 100 + 600).ms, duration: 400.ms).scale(
-          begin: const Offset(0.9, 0.9),
-          end: const Offset(1, 1),
-        );
-  }
-}

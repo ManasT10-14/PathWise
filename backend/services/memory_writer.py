@@ -12,6 +12,8 @@ Memory read/write failure must never fail the primary API operation —
 callers must wrap in try/except.
 """
 
+from datetime import datetime, timezone
+
 import structlog
 from firebase_admin import firestore
 from google.cloud.firestore_v1 import ArrayUnion
@@ -46,7 +48,7 @@ def write_analysis_memory(user_id: str, chain_result: dict, roadmap_id: str) -> 
         "target_role": goal.target_role,
         "gap_count": len(gaps.gaps),
         "phase_count": len(roadmap.phases),
-        "analyzed_at": firestore.SERVER_TIMESTAMP,
+        "analyzed_at": datetime.now(timezone.utc).isoformat(),
     }
 
     db = firestore.client()
@@ -99,7 +101,7 @@ def write_expert_annotation(
         "milestone_level": milestone_level,
         "annotation": annotation_text,
         "expert_id": expert_id,
-        "annotated_at": firestore.SERVER_TIMESTAMP,
+        "annotated_at": datetime.now(timezone.utc).isoformat(),
     }
 
     db = firestore.client()
@@ -151,7 +153,7 @@ def write_struggle_pattern(
         "stalled_stage": stalled_stage,
         "stall_days": stall_days,
         "resolution": resolution,
-        "recorded_at": firestore.SERVER_TIMESTAMP,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
     }
 
     db = firestore.client()
@@ -201,7 +203,7 @@ def write_pace_trend(
         "stage_progress": stage_progress,
         "total_progress": round(total_progress, 3),
         "days_elapsed": days_elapsed,
-        "recorded_at": firestore.SERVER_TIMESTAMP,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
     }
 
     db = firestore.client()

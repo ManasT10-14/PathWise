@@ -82,10 +82,10 @@ class _TimelineNodeState extends State<TimelineNode> {
                   Container(
                     width: 2,
                     height: 16,
-                    decoration: BoxDecoration(
-                      gradient: widget.isFirst
-                          ? null
-                          : LinearGradient(
+                    decoration: widget.isFirst
+                        ? null
+                        : BoxDecoration(
+                            gradient: LinearGradient(
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
@@ -93,8 +93,7 @@ class _TimelineNodeState extends State<TimelineNode> {
                                 statusColor,
                               ],
                             ),
-                    ),
-                    color: widget.isFirst ? Colors.transparent : null,
+                          ),
                   ),
                   // Node circle
                   _buildNodeCircle(statusColor),

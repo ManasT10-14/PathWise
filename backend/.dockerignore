@@ -8,3 +8,4 @@ venv/
 .git
 .gitignore
 *.md
+service-account.json

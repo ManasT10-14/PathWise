@@ -262,7 +262,7 @@ class _TimelineNodeState extends State<TimelineNode> {
             const SizedBox(height: 8),
             // Stage title — show short version when collapsed, full when expanded
             Text(
-              _expanded ? _fullDescription() : _shortTitle(),
+              _expanded ? widget.stage.title : _shortTitle(),
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 height: 1.4,

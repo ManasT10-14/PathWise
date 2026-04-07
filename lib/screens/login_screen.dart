@@ -173,9 +173,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                   )
                                 : const Icon(Icons.login_rounded),
-                            label: Text(
-                              _busy ? 'Signing in...' : 'Continue with Google',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            label: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                _busy ? 'Signing in...' : 'Sign in with Google',
+                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
                         ),

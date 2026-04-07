@@ -160,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           controller: _resume,
                           minLines: 2,
                           maxLines: 5,
-                          decoration: const InputDecoration(labelText: 'Résumé (text)'),
+                          decoration: const InputDecoration(labelText: 'Resume (text)'),
                         ),
                         const SizedBox(height: 8),
                         TextField(
@@ -479,6 +479,8 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
                   ),
                 ],
               ),
+              // Extra padding so keyboard doesn't hide the last field
+              SizedBox(height: MediaQuery.of(ctx).viewInsets.bottom + 40),
             ],
           ),
         ),

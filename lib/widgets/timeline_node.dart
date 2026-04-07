@@ -267,9 +267,33 @@ class _TimelineNodeState extends State<TimelineNode> {
                 fontWeight: FontWeight.w600,
                 height: 1.4,
               ),
-              maxLines: _expanded ? 10 : 2,
+              maxLines: _expanded ? 10 : 3,
               overflow: TextOverflow.ellipsis,
             ),
+            // Show task tags when collapsed (if tasks exist)
+            if (!_expanded && widget.stage.tasks.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: widget.stage.tasks.take(4).map((t) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppTheme.accent.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        t,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: AppTheme.accent.withOpacity(0.7),
+                          fontSize: 10,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )).toList(),
+              ),
+            ],
           ],
         ),
       ),

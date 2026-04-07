@@ -24,7 +24,6 @@ class BookConsultationScreen extends StatefulWidget {
 class _BookConsultationScreenState extends State<BookConsultationScreen> {
   String _type = 'chat';
   DateTime _when = DateTime.now().add(const Duration(hours: 1));
-  int _questionLimit = 5;
   bool _booking = false;
 
   Future<void> _pickTime() async {
@@ -78,7 +77,7 @@ class _BookConsultationScreenState extends State<BookConsultationScreen> {
         type: _type,
         status: 'pending',
         price: widget.expert.pricePerSession,
-        questionLimit: _questionLimit,
+        questionLimit: 0,
         scheduledAt: _when,
         createdAt: DateTime.now(),
       );
@@ -169,15 +168,6 @@ class _BookConsultationScreenState extends State<BookConsultationScreen> {
                     title: const Text('Scheduled time'),
                     subtitle: Text(DateFormat.yMMMd().add_jm().format(_when)),
                     trailing: IconButton(icon: const Icon(Icons.event), onPressed: _pickTime),
-                  ),
-                  Text('Question limit: $_questionLimit'),
-                  Slider(
-                    min: 1,
-                    max: 20,
-                    divisions: 19,
-                    value: _questionLimit.toDouble(),
-                    label: '$_questionLimit',
-                    onChanged: (v) => setState(() => _questionLimit = v.round()),
                   ),
                 ],
               ),

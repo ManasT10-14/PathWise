@@ -76,10 +76,25 @@ class Roadmap {
 
     for (var i = 0; i < milestones.length; i++) {
       final level = i < labels.length ? labels[i] : 'stage_${i + 1}';
+      // Parse tasks from milestone text — extract items after ":"
+      final raw = milestones[i];
+      final tasks = <String>[];
+      final colonIdx = raw.indexOf(':');
+      if (colonIdx > 0 && colonIdx < raw.length - 1) {
+        final afterColon = raw.substring(colonIdx + 1).trim();
+        tasks.addAll(
+          afterColon
+              .replaceAll(', and ', ', ')
+              .replaceAll(' and ', ', ')
+              .split(',')
+              .map((s) => s.trim().replaceAll(RegExp(r'[.]$'), ''))
+              .where((s) => s.isNotEmpty && s.length > 2),
+        );
+      }
       stages.add(RoadmapStage(
         level: level,
-        title: milestones[i],
-        tasks: const [],
+        title: raw,
+        tasks: tasks,
         resources: resourcesPerStage[i] ?? [],
       ));
     }

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:intl/intl.dart';
 
 import '../models/app_user.dart';
 import '../models/expert.dart';
+import '../models/review.dart';
+import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
+import '../widgets/skeleton_loader.dart';
 import 'book_consultation_screen.dart';
 
 class ExpertDetailScreen extends StatelessWidget {
@@ -161,6 +166,86 @@ class ExpertDetailScreen extends StatelessWidget {
                 ],
               ),
             ).animate().fadeIn(delay: 200.ms),
+
+            const SizedBox(height: 16),
+
+            // Reviews section
+            Text(
+              'Reviews',
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+            ).animate().fadeIn(delay: 250.ms),
+            const SizedBox(height: 8),
+            StreamBuilder<List<Review>>(
+              stream: context.svc.reviews.watchForExpert(expert.id),
+              builder: (context, snap) {
+                if (!snap.hasData) {
+                  return const SkeletonLoader(lines: 3);
+                }
+                final reviews = snap.data!;
+                if (reviews.isEmpty) {
+                  return GlassCard(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'No reviews yet',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return Column(
+                  children: List.generate(reviews.length, (i) {
+                    final r = reviews[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                ...List.generate(5, (star) => Icon(
+                                      star < r.rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                                      size: 16,
+                                      color: Colors.amber,
+                                    )),
+                                const Spacer(),
+                                if (r.timestamp != null)
+                                  Text(
+                                    DateFormat.yMMMd().format(r.timestamp!),
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: colorScheme.onSurface.withOpacity(0.4),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            if (r.feedback.isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                r.feedback,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  height: 1.4,
+                                  color: colorScheme.onSurface.withOpacity(0.7),
+                                ),
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: (i * 60 + 300).ms),
+                    );
+                  }),
+                );
+              },
+            ),
+
+            const SizedBox(height: 32),
           ],
         ),
       ),

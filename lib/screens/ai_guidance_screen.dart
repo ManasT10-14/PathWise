@@ -124,7 +124,7 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
     final goals = _goalsCtrl.text.trim();
     if (resume.isEmpty && _skills.isEmpty && goals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add résumé text, skills, or career goals so the AI can analyze gaps.')),
+        const SnackBar(content: Text('Add resume text, skills, or career goals so the AI can analyze gaps.')),
       );
       return;
     }
@@ -327,7 +327,7 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
                     ),
                     _StepPage(
                       title: 'Resume',
-                      subtitle: 'Paste your résumé or upload a text file.',
+                      subtitle: 'Paste your resume or upload a text file.',
                       child: Column(
                         children: [
                           TextField(
@@ -336,7 +336,7 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
                             maxLines: 10,
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
-                              hintText: 'Paste résumé text or upload a .txt file',
+                              hintText: 'Paste resume text or upload a .txt file',
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -364,7 +364,7 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
                                   controller: _interestCtrl,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
-                                    hintText: 'Interest area',
+                                    hintText: 'e.g. AI, Web Dev, Cloud, Data Science',
                                   ),
                                   onSubmitted: (_) => _addInterest(),
                                 ),

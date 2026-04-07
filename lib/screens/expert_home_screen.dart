@@ -83,15 +83,113 @@ class ExpertHomeScreen extends StatelessWidget {
               }
 
               final list = snap.data!;
-              if (list.isEmpty) {
-                return EmptyStateWidget(
-                  title: 'No Bookings Yet',
-                  subtitle: 'Your consultation requests will appear here',
-                  icon: Icons.calendar_today_outlined,
-                );
-              }
+              final pending = list.where((c) => c.status == 'pending').length;
+              final completed = list.where((c) => c.status == 'completed').length;
+              final accepted = list.where((c) => c.status == 'accepted').length;
 
-              return ListView.separated(
+              return ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Expert profile summary
+                  GlassCard(
+                    glowColor: AppTheme.accent,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: colorScheme.primaryContainer,
+                          child: Text(
+                            expert.name.isNotEmpty ? expert.name[0].toUpperCase() : '?',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      expert.name,
+                                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (expert.isVerified)
+                                    const Icon(Icons.verified_rounded, size: 18, color: AppTheme.accentSecondary),
+                                ],
+                              ),
+                              if (expert.domain.isNotEmpty)
+                                Text(
+                                  expert.domain,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: AppTheme.accent,
+                                  ),
+                                ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    '${expert.rating.toStringAsFixed(1)} (${expert.totalReviews} reviews)',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurface.withOpacity(0.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ).animate().fadeIn(duration: 300.ms),
+
+                  const SizedBox(height: 12),
+
+                  // Quick stats row
+                  Row(
+                    children: [
+                      _StatChip(label: 'Pending', value: '$pending', color: AppTheme.warning),
+                      const SizedBox(width: 8),
+                      _StatChip(label: 'Active', value: '$accepted', color: AppTheme.accent),
+                      const SizedBox(width: 8),
+                      _StatChip(label: 'Done', value: '$completed', color: AppTheme.success),
+                      const SizedBox(width: 8),
+                      _StatChip(label: 'Total', value: '${list.length}', color: AppTheme.accentSecondary),
+                    ],
+                  ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
+
+                  const SizedBox(height: 20),
+
+                  Text(
+                    'Consultations',
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 8),
+
+                  if (list.isEmpty)
+                    EmptyStateWidget(
+                      title: 'No Bookings Yet',
+                      subtitle: 'Your consultation requests will appear here',
+                      icon: Icons.calendar_today_outlined,
+                    )
+                  else
+                    ...List.generate(list.length, (i) {
+                      final c = list[i];
+                      final statusColor = _statusColor(c.status);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: GestureDetector(
                 padding: const EdgeInsets.all(16),
                 itemCount: list.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 8),
@@ -244,13 +342,50 @@ class ExpertHomeScreen extends StatelessWidget {
                         ],
                       ),
                     ).animate().fadeIn(delay: (i * 80).ms).slideY(begin: 0.05, end: 0),
-                  );
-                },
+                      );
+                    }),
+                  const SizedBox(height: 80),
+                ],
               );
             },
           );
         },
       ),
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  const _StatChip({required this.label, required this.value, required this.color});
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 10,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

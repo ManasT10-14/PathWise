@@ -25,8 +25,8 @@ class Settings(BaseSettings):
     firebase_service_account: str = ""
 
     # --- Razorpay ---
-    razorpay_key_id: str
-    razorpay_key_secret: str
+    razorpay_key_id: str = ""
+    razorpay_key_secret: str = ""
     razorpay_webhook_secret: str = ""
 
     # --- CORS ---

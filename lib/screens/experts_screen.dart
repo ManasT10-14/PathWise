@@ -61,7 +61,7 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
       body: GradientBackground(
         variant: GradientVariant.primary,
         child: StreamBuilder<List<Expert>>(
-        stream: svc.experts.watchExperts(),
+        stream: svc.experts.watchVerifiedExperts(),
         builder: (context, snap) {
           if (snap.hasError) {
             return Center(

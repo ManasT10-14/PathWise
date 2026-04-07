@@ -26,6 +26,42 @@ class ExpertRepository {
     });
   }
 
+  /// Creates a default expert profile linked to a user account.
+  /// Called when admin promotes a user to expert role.
+  Future<String> createForUser({
+    required String uid,
+    required String name,
+    required String email,
+  }) async {
+    // Check if expert profile already exists
+    final existing = await findExpertForUser(uid: uid, email: email);
+    if (existing != null) return existing.id;
+
+    final doc = _col.doc();
+    await doc.set({
+      'expertId': doc.id,
+      'name': name,
+      'email': email,
+      'domain': '',
+      'experience': '',
+      'rating': 0.0,
+      'pricePerSession': 500,
+      'isVerified': false,
+      'skills': <String>[],
+      'totalReviews': 0,
+      'linkedUserId': uid,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+    return doc.id;
+  }
+
+  /// Returns only verified experts for the user-facing marketplace.
+  Stream<List<Expert>> watchVerifiedExperts() {
+    return _col.where('isVerified', isEqualTo: true).snapshots().map(
+          (q) => q.docs.map((d) => Expert.fromFirestore(d.id, d.data())).toList(),
+        );
+  }
+
   Future<Expert?> fetchExpert(String expertDocId) async {
     final s = await _col.doc(expertDocId).get();
     if (!s.exists || s.data() == null) return null;

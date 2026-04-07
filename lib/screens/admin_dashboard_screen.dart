@@ -225,7 +225,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         trailing: PopupMenuButton<String>(
                           onSelected: (v) async {
                             if (v == 'admin') await svc.users.setRole(u.uid, UserRole.admin);
-                            if (v == 'expert') await svc.users.setRole(u.uid, UserRole.expert);
+                            if (v == 'expert') {
+                              await svc.users.setRole(u.uid, UserRole.expert);
+                              // Auto-create expert profile so expert can log in immediately
+                              await svc.experts.createForUser(
+                                uid: u.uid,
+                                name: u.name,
+                                email: u.email,
+                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Expert profile created. User can now log in as expert.')),
+                                );
+                              }
+                            }
                             if (v == 'user') await svc.users.setRole(u.uid, UserRole.user);
                           },
                           itemBuilder: (context) => const [

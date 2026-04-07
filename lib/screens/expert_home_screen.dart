@@ -127,13 +127,29 @@ class ExpertHomeScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Show learner name
+                                FutureBuilder(
+                                  future: svc.users.fetchUser(c.userId),
+                                  builder: (ctx, userSnap) {
+                                    final learnerName = userSnap.data?.name ?? 'Learner';
+                                    return Text(
+                                      learnerName,
+                                      style: theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 2),
                                 Row(
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        c.type.toUpperCase(),
-                                        style: theme.textTheme.titleSmall?.copyWith(
-                                          fontWeight: FontWeight.bold,
+                                        '${c.type.toUpperCase()} session',
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: colorScheme.onSurface.withOpacity(0.6),
                                         ),
                                       ),
                                     ),
@@ -179,13 +195,27 @@ class ExpertHomeScreen extends StatelessWidget {
                                     Icon(Icons.chevron_right, color: colorScheme.outline),
                                     const SizedBox(height: 4),
                                     GestureDetector(
-                                      onTap: () {
-                                        // Per EXP-04: pass roadmapId=c.consultationId (backend looks up
-                                        // user's active roadmap via userId), learnerId=c.userId.
+                                      onTap: () async {
+                                        // Look up the learner's latest roadmap
+                                        final roadmapSnap = await svc.roadmaps
+                                            .watchForUser(c.userId)
+                                            .first;
+                                        if (roadmapSnap.isEmpty) {
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('This learner has no roadmap yet'),
+                                              ),
+                                            );
+                                          }
+                                          return;
+                                        }
+                                        final latestRoadmap = roadmapSnap.first;
+                                        if (!context.mounted) return;
                                         Navigator.of(context).push(
                                           MaterialPageRoute<void>(
                                             builder: (_) => ExpertAnnotationScreen(
-                                              roadmapId: c.consultationId,
+                                              roadmapId: latestRoadmap.id,
                                               learnerId: c.userId,
                                               consultationId: c.id,
                                             ),

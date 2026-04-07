@@ -45,22 +45,39 @@ class ReviewRepository {
 
     await batch.commit();
 
-    final all = await _col.where('expertId', isEqualTo: expertDocId).get();
-    var sum = 0;
-    var n = 0;
-    for (final d in all.docs) {
-      final r = d.data()['rating'];
-      if (r is num) {
-        sum += r.toInt();
-        n++;
-      }
-    }
-    if (n > 0) {
-      await _experts.updateRatingStats(expertDocId, sum / n, n);
-    }
+    // Recalculate expert rating (excludes flagged reviews)
+    await _recalculateRating(expertDocId);
   }
 
   Future<void> deleteReview(String reviewDocId) async {
+    // Read expert ID before deleting so we can recalculate rating
+    final doc = await _col.doc(reviewDocId).get();
+    final expertId = doc.data()?['expertId']?.toString();
+
     await _col.doc(reviewDocId).delete();
+
+    // Recalculate expert rating after deletion
+    if (expertId != null && expertId.isNotEmpty) {
+      await _recalculateRating(expertId);
+    }
+  }
+
+  /// Recalculates an expert's rating from all unflagged reviews.
+  Future<void> _recalculateRating(String expertDocId) async {
+    final all = await _col.where('expertId', isEqualTo: expertDocId).get();
+    var totalRating = 0;
+    var count = 0;
+    for (final d in all.docs) {
+      final data = d.data();
+      // Skip flagged reviews
+      if (data['flagged'] == true) continue;
+      final r = data['rating'];
+      if (r is num) {
+        totalRating += r.toInt();
+        count++;
+      }
+    }
+    final avg = count > 0 ? totalRating / count : 0.0;
+    await _experts.updateRatingStats(expertDocId, avg, count);
   }
 }

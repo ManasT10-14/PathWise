@@ -344,7 +344,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             _AppInfoRow(icon: Icons.school_rounded, label: 'Qualification', value: app['qualification'] as String),
                           if ((app['linkedinUrl'] as String?)?.isNotEmpty == true)
                             _AppInfoRow(icon: Icons.link_rounded, label: 'LinkedIn', value: app['linkedinUrl'] as String),
-                          if (app['pricePerSession'] != null)
+                          if (app['pricing'] is Map) ...[
+                            _AppInfoRow(icon: Icons.chat_rounded, label: 'Chat rate', value: 'INR ${(app['pricing'] as Map)['chat'] ?? '—'}'),
+                            _AppInfoRow(icon: Icons.call_rounded, label: 'Call rate', value: 'INR ${(app['pricing'] as Map)['call'] ?? '—'}'),
+                            _AppInfoRow(icon: Icons.videocam_rounded, label: 'Video rate', value: 'INR ${(app['pricing'] as Map)['video'] ?? '—'}'),
+                          ] else if (app['pricePerSession'] != null)
                             _AppInfoRow(icon: Icons.currency_rupee_rounded, label: 'Price/session', value: 'INR ${app['pricePerSession']}'),
                           if ((app['whyMentor'] as String?)?.isNotEmpty == true)
                             _AppInfoRow(icon: Icons.favorite_outline_rounded, label: 'Motivation', value: app['whyMentor'] as String),

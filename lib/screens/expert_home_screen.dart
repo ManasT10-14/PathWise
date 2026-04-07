@@ -190,14 +190,6 @@ class ExpertHomeScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: GestureDetector(
-                padding: const EdgeInsets.all(16),
-                itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (context, i) {
-                  final c = list[i];
-                  final statusColor = _statusColor(c.status);
-
-                  return GestureDetector(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
                         builder: (_) => ConsultationDetailScreen(

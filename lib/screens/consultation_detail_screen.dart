@@ -330,6 +330,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                             child: OutlinedButton(
                               onPressed: () async {
                                 await svc.consultations.updateStatus(c.id, 'cancelled');
+                                await svc.notifications.cancelReminder(c.id);
                               },
                               child: const Text('Cancel booking'),
                             ),
@@ -412,7 +413,25 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                               ),
                             ),
                           ],
-                          // Meet link for audio/video
+                          // Meet link status for audio/video
+                          if (c.type != 'chat' && (c.meetLink == null || c.meetLink!.isEmpty)) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.info_outline_rounded, size: 14, color: AppTheme.warning.withOpacity(0.7)),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    'Waiting for expert to share meeting link',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.warning.withOpacity(0.7),
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           if (c.type != 'chat' && c.meetLink != null && c.meetLink!.isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Row(
@@ -471,6 +490,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                         child: FilledButton(
                           onPressed: () async {
                             await svc.consultations.updateStatus(c.id, 'completed');
+                            await svc.notifications.cancelReminder(c.id);
                           },
                           child: const Text('Mark completed'),
                         ),

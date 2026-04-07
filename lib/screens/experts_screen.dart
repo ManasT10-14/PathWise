@@ -29,8 +29,10 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
   List<Expert> _applyFiltersAndSort(List<Expert> list) {
     var filtered = list.where((e) {
       final domainMatch = _selectedDomain == null || e.domain == _selectedDomain;
-      final priceMatch = e.pricePerSession >= _priceRange.start &&
-          e.pricePerSession <= _priceRange.end;
+      final priceMatch =
+          (e.priceChat >= _priceRange.start && e.priceChat <= _priceRange.end) ||
+          (e.priceCall >= _priceRange.start && e.priceCall <= _priceRange.end) ||
+          (e.priceVideo >= _priceRange.start && e.priceVideo <= _priceRange.end);
       final ratingMatch = e.rating >= _minRating;
       return domainMatch && priceMatch && ratingMatch;
     }).toList();

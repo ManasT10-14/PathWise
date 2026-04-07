@@ -83,6 +83,10 @@ class ExpertRepository {
     required String domain,
     required String experience,
     required List<String> skills,
+    String qualification = '',
+    String linkedinUrl = '',
+    String whyMentor = '',
+    int pricePerSession = 500,
   }) async {
     // Prevent duplicate applications
     final existing = await _applications.where('uid', isEqualTo: uid).limit(1).get();
@@ -99,6 +103,10 @@ class ExpertRepository {
       'domain': domain,
       'experience': experience,
       'skills': skills,
+      'qualification': qualification,
+      'linkedinUrl': linkedinUrl,
+      'whyMentor': whyMentor,
+      'pricePerSession': pricePerSession,
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
@@ -120,17 +128,19 @@ class ExpertRepository {
     final domain = app['domain'] as String? ?? '';
     final experience = app['experience'] as String? ?? '';
     final skills = (app['skills'] as List?)?.cast<String>() ?? <String>[];
+    final price = app['pricePerSession'] is num ? (app['pricePerSession'] as num).toInt() : 500;
 
     // Create expert profile
     await createForUser(uid: uid, name: name, email: email);
 
-    // Update expert profile with application details
+    // Update expert profile with full application details
     final expert = await findExpertForUser(uid: uid, email: email);
     if (expert != null) {
       await _col.doc(expert.id).update({
         'domain': domain,
         'experience': experience,
         'skills': skills,
+        'pricePerSession': price,
         'isVerified': true,
       });
     }

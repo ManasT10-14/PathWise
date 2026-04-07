@@ -306,6 +306,10 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
   bool _submitting = false;
   final _domainCtrl = TextEditingController();
   final _experienceCtrl = TextEditingController();
+  final _qualificationCtrl = TextEditingController();
+  final _linkedinCtrl = TextEditingController();
+  final _whyCtrl = TextEditingController();
+  final _priceCtrl = TextEditingController(text: '500');
 
   @override
   void initState() {
@@ -317,6 +321,10 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
   void dispose() {
     _domainCtrl.dispose();
     _experienceCtrl.dispose();
+    _qualificationCtrl.dispose();
+    _linkedinCtrl.dispose();
+    _whyCtrl.dispose();
+    _priceCtrl.dispose();
     super.dispose();
   }
 
@@ -326,48 +334,154 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
   }
 
   Future<void> _showApplicationDialog() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Apply as Expert'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (_, scrollCtrl) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(ctx).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: ListView(
+            controller: scrollCtrl,
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
             children: [
-              const Text(
-                'Share your expertise with learners. Your application will be reviewed by an admin.',
-                style: TextStyle(fontSize: 13),
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
+              Text('Apply as Expert', style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              Text(
+                'Fill in your details so the admin can verify your expertise.',
+                style: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: Colors.white.withOpacity(0.5)),
+              ),
+              const SizedBox(height: 24),
+
+              // Pre-filled info
+              GlassCard(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your Profile', style: Theme.of(ctx).textTheme.labelSmall?.copyWith(
+                      color: AppTheme.accentSecondary, fontWeight: FontWeight.w700, letterSpacing: 0.8,
+                    )),
+                    const SizedBox(height: 8),
+                    _InfoRow(label: 'Name', value: widget.appUser.name),
+                    _InfoRow(label: 'Email', value: widget.appUser.email),
+                    if (widget.appUser.skills.isNotEmpty)
+                      _InfoRow(label: 'Skills', value: widget.appUser.skills.join(', ')),
+                    if (widget.appUser.careerGoals.isNotEmpty)
+                      _InfoRow(label: 'Goals', value: widget.appUser.careerGoals),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Application fields
               TextField(
                 controller: _domainCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Domain / Specialty',
-                  hintText: 'e.g. Machine Learning, System Design',
+                  labelText: 'Domain / Specialty *',
+                  hintText: 'e.g. Machine Learning, System Design, Data Science',
+                  prefixIcon: Icon(Icons.category_rounded, size: 20),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               TextField(
                 controller: _experienceCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Experience',
-                  hintText: 'e.g. 5 years in ML at Google',
+                  labelText: 'Work Experience *',
+                  hintText: 'e.g. 5 years as ML Engineer at Google',
+                  prefixIcon: Icon(Icons.work_outline_rounded, size: 20),
                 ),
                 maxLines: 2,
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _qualificationCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Qualifications',
+                  hintText: 'e.g. M.Tech in CS from IIT Delhi, AWS Certified',
+                  prefixIcon: Icon(Icons.school_rounded, size: 20),
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _linkedinCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'LinkedIn / Portfolio URL',
+                  hintText: 'https://linkedin.com/in/yourprofile',
+                  prefixIcon: Icon(Icons.link_rounded, size: 20),
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _priceCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Preferred Price per Session (INR) *',
+                  hintText: '500',
+                  prefixIcon: Icon(Icons.currency_rupee_rounded, size: 20),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: _whyCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Why do you want to mentor? *',
+                  hintText: 'What motivates you to guide learners?',
+                  prefixIcon: Icon(Icons.favorite_outline_rounded, size: 20),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        if (_domainCtrl.text.trim().isEmpty ||
+                            _experienceCtrl.text.trim().isEmpty ||
+                            _whyCtrl.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            const SnackBar(content: Text('Please fill in all required fields (*)')),
+                          );
+                          return;
+                        }
+                        Navigator.pop(ctx, true);
+                      },
+                      icon: const Icon(Icons.send_rounded, size: 18),
+                      label: const Text('Submit Application'),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Submit Application'),
-          ),
-        ],
       ),
     );
 
@@ -382,6 +496,10 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
         domain: _domainCtrl.text.trim(),
         experience: _experienceCtrl.text.trim(),
         skills: widget.appUser.skills,
+        qualification: _qualificationCtrl.text.trim(),
+        linkedinUrl: _linkedinCtrl.text.trim(),
+        whyMentor: _whyCtrl.text.trim(),
+        pricePerSession: int.tryParse(_priceCtrl.text.trim()) ?? 500,
       );
       if (mounted) {
         setState(() => _status = 'pending');
@@ -498,5 +616,40 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
         ],
       ),
     ).animate().fadeIn(delay: 200.ms);
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 50,
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withOpacity(0.4),
+                  ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodySmall,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

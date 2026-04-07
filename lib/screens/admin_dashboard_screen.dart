@@ -334,21 +334,31 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               ),
                             ],
                           ),
-                          if ((app['domain'] as String?)?.isNotEmpty == true) ...[
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(Icons.work_outline, size: 14, color: colorScheme.onSurface.withOpacity(0.5)),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    '${app['domain']} • ${app['experience'] ?? ''}',
-                                    style: theme.textTheme.bodySmall,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
+                          const SizedBox(height: 10),
+                          // Domain & Experience
+                          if ((app['domain'] as String?)?.isNotEmpty == true)
+                            _AppInfoRow(icon: Icons.category_rounded, label: 'Domain', value: app['domain'] as String),
+                          if ((app['experience'] as String?)?.isNotEmpty == true)
+                            _AppInfoRow(icon: Icons.work_outline_rounded, label: 'Experience', value: app['experience'] as String),
+                          if ((app['qualification'] as String?)?.isNotEmpty == true)
+                            _AppInfoRow(icon: Icons.school_rounded, label: 'Qualification', value: app['qualification'] as String),
+                          if ((app['linkedinUrl'] as String?)?.isNotEmpty == true)
+                            _AppInfoRow(icon: Icons.link_rounded, label: 'LinkedIn', value: app['linkedinUrl'] as String),
+                          if (app['pricePerSession'] != null)
+                            _AppInfoRow(icon: Icons.currency_rupee_rounded, label: 'Price/session', value: 'INR ${app['pricePerSession']}'),
+                          if ((app['whyMentor'] as String?)?.isNotEmpty == true)
+                            _AppInfoRow(icon: Icons.favorite_outline_rounded, label: 'Motivation', value: app['whyMentor'] as String),
+                          if ((app['skills'] as List?)?.isNotEmpty == true) ...[
+                            const SizedBox(height: 4),
+                            Wrap(
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: (app['skills'] as List).take(6).map((s) => Chip(
+                                label: Text(s.toString(), style: const TextStyle(fontSize: 10)),
+                                visualDensity: VisualDensity.compact,
+                                padding: EdgeInsets.zero,
+                                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              )).toList(),
                             ),
                           ],
                           if (isPending) ...[
@@ -821,6 +831,45 @@ class _OverviewRow extends StatelessWidget {
           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
         ),
       ],
+    );
+  }
+}
+
+class _AppInfoRow extends StatelessWidget {
+  const _AppInfoRow({required this.icon, required this.label, required this.value});
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 14, color: theme.colorScheme.onSurface.withOpacity(0.4)),
+          const SizedBox(width: 8),
+          SizedBox(
+            width: 80,
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodySmall,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

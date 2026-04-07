@@ -17,22 +17,31 @@ import json as _json
 import os
 import tempfile as _tmp
 
-# Check for Firebase service account credentials
+# Write credential JSON env vars to temp files so Google SDKs can read them.
+# We store file paths for later use by Firebase and Vertex AI separately.
+_firebase_creds_path = None
+_vertex_creds_path = None
+
 _sa_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON", "")
-if _sa_json and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+if _sa_json:
     _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
     _tf.write(_sa_json)
     _tf.close()
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _tf.name
+    _firebase_creds_path = _tf.name
 
-# Check for separate Vertex AI credentials (if using a dedicated AI service account)
 _vtx_json = os.environ.get("VERTEX_AI_CREDENTIALS_JSON", "")
 if _vtx_json:
     _vtx_tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
     _vtx_tf.write(_vtx_json)
     _vtx_tf.close()
-    # This overrides ADC for all Google SDKs including google-genai
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _vtx_tf.name
+    _vertex_creds_path = _vtx_tf.name
+
+# Set GOOGLE_APPLICATION_CREDENTIALS for the google-genai SDK (Vertex AI).
+# Prefer dedicated Vertex AI creds; fall back to Firebase creds if same account.
+if _vertex_creds_path:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _vertex_creds_path
+elif _firebase_creds_path:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _firebase_creds_path
 
 import uuid
 
@@ -79,11 +88,16 @@ if not firebase_admin._apps:
         _cred = firebase_admin.credentials.Certificate(settings.firebase_service_account)
         firebase_admin.initialize_app(_cred)
         log.info("firebase_initialized", source="service_account_file")
-    elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
-        # Railway/cloud: credentials file created at top of this file from env JSON
-        _cred = firebase_admin.credentials.Certificate(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+    elif _firebase_creds_path:
+        # Use Firebase-specific credentials (not Vertex AI override)
+        _cred = firebase_admin.credentials.Certificate(_firebase_creds_path)
         firebase_admin.initialize_app(_cred)
-        log.info("firebase_initialized", source="env_credentials_file")
+        log.info("firebase_initialized", source="firebase_env_json")
+    elif _vertex_creds_path:
+        # Fall back to Vertex AI creds if Firebase creds not separate
+        _cred = firebase_admin.credentials.Certificate(_vertex_creds_path)
+        firebase_admin.initialize_app(_cred)
+        log.info("firebase_initialized", source="vertex_creds_fallback")
     else:
         firebase_admin.initialize_app()
         log.info("firebase_initialized", source="application_default_credentials")

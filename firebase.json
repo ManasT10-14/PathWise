@@ -1,0 +1,31 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "feisty-access-470613-g0",
+          "appId": "1:785753121377:android:307c52c8e688ce2ce34020",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "feisty-access-470613-g0",
+          "configurations": {
+            "android": "1:785753121377:android:307c52c8e688ce2ce34020",
+            "ios": "1:785753121377:ios:ac3412c47ed21872e34020",
+            "macos": "1:785753121377:ios:ac3412c47ed21872e34020",
+            "web": "1:785753121377:web:e9d77c907ade028ae34020",
+            "windows": "1:785753121377:web:e3b54a04c644e16ce34020"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-south1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

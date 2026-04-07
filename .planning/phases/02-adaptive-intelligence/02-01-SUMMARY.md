@@ -128,6 +128,14 @@ None - no external service configuration required beyond what was set up in Phas
 - Expert annotation endpoint (write_expert_annotation) is available for expert consultation flow
 - Rate limiting (3/day) and ownership check are in place — secure for production
 
+## Self-Check: PASSED
+
+All created files exist on disk. All task commits verified in git log:
+- `f9b5302` FOUND: feat(02-01): add learner memory writer and replan prompt template
+- `796fde9` FOUND: feat(02-01): add replanner service and ReplanRequest/ReplanResponse models
+- `a32b50b` FOUND: feat(02-01): add replan endpoint, memory write on analyze, roadmap versioning
+- `0ddf545` FOUND: docs(02-01): complete plan summary and state updates
+
 ---
 *Phase: 02-adaptive-intelligence*
 *Completed: 2026-04-07*

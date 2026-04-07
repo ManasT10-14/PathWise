@@ -31,7 +31,6 @@ structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(fmt="iso"),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
@@ -54,6 +53,15 @@ if not firebase_admin._apps:
         _cred = firebase_admin.credentials.Certificate(settings.firebase_service_account)
         firebase_admin.initialize_app(_cred)
         log.info("firebase_initialized", source="service_account_file")
+    elif _sa_json := __import__("os").environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"):
+        # Railway/cloud: service account JSON passed as env var (no file upload)
+        import json as _json, tempfile as _tmp
+        _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+        _tf.write(_sa_json)
+        _tf.close()
+        _cred = firebase_admin.credentials.Certificate(_tf.name)
+        firebase_admin.initialize_app(_cred)
+        log.info("firebase_initialized", source="env_json")
     else:
         # Relies on GOOGLE_APPLICATION_CREDENTIALS env var (Application Default Credentials)
         firebase_admin.initialize_app()

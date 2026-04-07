@@ -10,7 +10,7 @@ class AuthService {
             GoogleSignIn(
               scopes: const ['email', 'profile'],
               // Web client (type 3) from google-services.json — needed for Firebase credential on Android.
-              serverClientId: '477245821723-lvsdjo8p2ntmf2rlm6p1hjs43p50d56g.apps.googleusercontent.com',
+              serverClientId: '785753121377-la99mt79m1a9c27rbvsi2fgnb2ajdno9.apps.googleusercontent.com',
             );
 
   final FirebaseAuth _auth;

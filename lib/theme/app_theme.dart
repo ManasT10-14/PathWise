@@ -49,7 +49,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -75,7 +75,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
       ),
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),

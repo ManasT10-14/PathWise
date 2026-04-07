@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../main.dart';
 import '../models/app_user.dart';
 import '../theme/app_theme.dart';
 import 'home_mode_screen.dart';
@@ -31,22 +30,6 @@ class _UserMainShellState extends State<UserMainShell> {
     ];
 
     return Scaffold(
-      appBar: _index == 0
-          ? null
-          : AppBar(
-              title: const Text('Profile'),
-              actions: [
-                ValueListenableBuilder<ThemeMode>(
-                  valueListenable: themeMode,
-                  builder: (context, mode, _) => IconButton(
-                    icon: Icon(mode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
-                    onPressed: () {
-                      themeMode.value = mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
-                    },
-                  ),
-                ),
-              ],
-            ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeOut,

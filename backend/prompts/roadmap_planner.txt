@@ -10,10 +10,10 @@ Original Career Goals: {career_goals}
 ## Instructions
 1. Create 3–5 learning phases (milestones). Each phase must have a level label: "beginner", "intermediate", or "advanced". Do not repeat level labels unless the content is clearly distinct.
 2. Each phase must include:
-   - A descriptive title that names the skills covered (e.g., "Foundations: Python and Statistics for ML", NOT just "Phase 1")
-   - A list of skills addressed in that phase (drawn from the skill gaps list)
+   - A SHORT title (max 8 words) that names the skills covered (e.g., "Python and Statistics for ML", NOT "Foundations: Learn core Python programming, tooling, and setup for machine learning prerequisites")
+   - A list of skills addressed in that phase (drawn from the skill gaps list). List each skill as a SEPARATE item, not joined in a long comma-separated sentence.
    - Estimated hours to complete — be realistic, not optimistic. Include time for practice, debugging, and review.
-   - 3–5 concrete tasks the learner must actually do (e.g., "Complete Andrew Ng's ML Specialization Weeks 1–4", "Build a sentiment analysis model on a Kaggle dataset", NOT "Learn machine learning")
+   - 3–5 concrete tasks the learner must actually do. Each task must be ONE clear action (e.g., "Complete Andrew Ng's ML Specialization Weeks 1-4", "Build a sentiment analysis model on a Kaggle dataset"). Do NOT combine multiple tasks in one string.
 3. Sequence phases so prerequisites come before dependent skills. The learner must be able to follow phases in order.
 4. Include revision_points — specific moments where the learner should self-assess before advancing (e.g., "After Phase 1: verify Python proficiency by solving 10 LeetCode Easy problems").
 5. Calculate total_estimated_hours as the sum of all phase hours.

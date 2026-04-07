@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/roadmap.dart';
 import '../theme/app_theme.dart';
@@ -42,27 +43,16 @@ class _TimelineNodeState extends State<TimelineNode> {
     return Colors.white.withOpacity(0.25);
   }
 
-  /// Extracts a short display name from the milestone title.
-  /// Gemini returns titles like "Beginner — Foundations for ML: core syntax..."
-  /// We take the part after the dash, or truncate to ~60 chars.
+  /// Extracts the meaningful part of the milestone title.
+  /// Strips the "Beginner — " / "Intermediate — " prefix if present.
   String _shortTitle() {
     final raw = widget.stage.title;
-    // Try splitting on common separators
     for (final sep in [' — ', ' -- ', ' - ']) {
       final idx = raw.indexOf(sep);
-      if (idx > 0 && idx < raw.length - sep.length) {
-        final after = raw.substring(idx + sep.length).trim();
-        // If what's after is still long, take up to the first colon or period
-        final colonIdx = after.indexOf(':');
-        if (colonIdx > 0 && colonIdx < 60) return after.substring(0, colonIdx).trim();
-        final periodIdx = after.indexOf('.');
-        if (periodIdx > 0 && periodIdx < 60) return after.substring(0, periodIdx).trim();
-        if (after.length > 60) return '${after.substring(0, 57)}...';
-        return after;
+      if (idx > 0 && idx < 30) {
+        return raw.substring(idx + sep.length).trim();
       }
     }
-    // No separator found — truncate the raw title
-    if (raw.length > 60) return '${raw.substring(0, 57)}...';
     return raw;
   }
 
@@ -260,15 +250,13 @@ class _TimelineNodeState extends State<TimelineNode> {
               ],
             ),
             const SizedBox(height: 8),
-            // Stage title — show short version when collapsed, full when expanded
+            // Stage title — show cleaned version when collapsed, full when expanded
             Text(
               _expanded ? widget.stage.title : _shortTitle(),
               style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                height: 1.4,
+                fontWeight: FontWeight.w500,
+                height: 1.5,
               ),
-              maxLines: _expanded ? 10 : 3,
-              overflow: TextOverflow.ellipsis,
             ),
             // Show task tags when collapsed (if tasks exist)
             if (!_expanded && widget.stage.tasks.isNotEmpty) ...[
@@ -357,35 +345,76 @@ class _TimelineNodeState extends State<TimelineNode> {
                 ),
               )),
 
-          // Resources
+          // Resources (clickable)
           if (widget.stage.resources.isNotEmpty) ...[
             const SizedBox(height: 16),
             _SectionHeader(icon: Icons.menu_book_rounded, title: 'Resources', color: AppTheme.accent),
             const SizedBox(height: 6),
-            ...widget.stage.resources.map((r) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(Icons.link_rounded, size: 14, color: AppTheme.accent.withOpacity(0.6)),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          r,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppTheme.accent.withOpacity(0.8),
-                            height: 1.3,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+            ...widget.stage.resources.map((r) {
+              // Extract title and URL if format is "Title (URL)" or just URL
+              final urlMatch = RegExp(r'(https?://\S+)').firstMatch(r);
+              final url = urlMatch?.group(0);
+              final title = url != null ? r.replaceAll(url, '').replaceAll('()', '').trim() : r;
+              final displayTitle = title.isNotEmpty ? title : (url ?? r);
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: GestureDetector(
+                  onTap: url != null
+                      ? () async {
+                          final uri = Uri.tryParse(url);
+                          if (uri != null) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                      : null,
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppTheme.accent.withOpacity(0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.accent.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          url != null ? Icons.open_in_new_rounded : Icons.link_rounded,
+                          size: 14,
+                          color: AppTheme.accent.withOpacity(0.7),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                displayTitle,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: url != null ? AppTheme.accent : muted,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: url != null ? TextDecoration.underline : null,
+                                  decorationColor: AppTheme.accent.withOpacity(0.4),
+                                  height: 1.4,
+                                ),
+                              ),
+                              if (url != null && title.isNotEmpty)
+                                Text(
+                                  url,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: muted.withOpacity(0.6),
+                                    fontSize: 10,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                )),
+                ),
+              );
+            }),
           ],
 
           // Progress slider

@@ -117,7 +117,12 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
     setState(() => _progress[level] = val);
     await widget.repo.updateProgress(widget.roadmap.id, _progress);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Progress saved')));
+      // Clear any existing snackbar first to prevent spam
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Progress saved'),
+        duration: Duration(seconds: 1),
+      ));
     }
   }
 

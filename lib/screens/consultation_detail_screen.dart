@@ -163,6 +163,20 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     }
   }
 
+  String _formatTimeUntil(int? minutes) {
+    if (minutes == null) return '—';
+    if (minutes < 0) return 'now';
+    if (minutes < 60) return '$minutes min';
+    if (minutes < 1440) {
+      final h = minutes ~/ 60;
+      final m = minutes % 60;
+      return m > 0 ? '${h}h ${m}m' : '${h}h';
+    }
+    final days = minutes ~/ 1440;
+    final h = (minutes % 1440) ~/ 60;
+    return h > 0 ? '${days}d ${h}h' : '${days}d';
+  }
+
   Future<void> _launchUrl(String url) async {
     final uri = Uri.tryParse(url);
     if (uri != null && await canLaunchUrl(uri)) {
@@ -363,7 +377,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                                 child: Text(
                                   c.canStartSession()
                                       ? 'Session is ready to start!'
-                                      : 'Session in ${c.minutesUntilSession()} min',
+                                      : 'Session in ${_formatTimeUntil(c.minutesUntilSession())}',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     fontWeight: FontWeight.w600,
                                   ),

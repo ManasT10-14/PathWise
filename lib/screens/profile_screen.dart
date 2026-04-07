@@ -316,7 +316,8 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
   @override
   void initState() {
     super.initState();
-    _loadStatus();
+    // Defer to after first frame so context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadStatus());
   }
 
   @override

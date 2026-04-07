@@ -10,8 +10,10 @@ import 'screens/role_router.dart';
 import 'services/ai_roadmap_service.dart';
 import 'services/api_client.dart';
 import 'services/auth_service.dart';
+import 'services/chat_service.dart';
 import 'services/consultation_repository.dart';
 import 'services/expert_repository.dart';
+import 'services/notification_service.dart';
 import 'services/payment_service.dart';
 import 'services/review_repository.dart';
 import 'services/roadmap_repository.dart';
@@ -23,11 +25,18 @@ ValueNotifier<ThemeMode> themeMode = ValueNotifier(ThemeMode.dark);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const PathwiseApp());
+
+  // Initialize notifications
+  final notificationService = NotificationService();
+  await notificationService.init();
+
+  runApp(PathwiseApp(notificationService: notificationService));
 }
 
 class PathwiseApp extends StatefulWidget {
-  const PathwiseApp({super.key});
+  const PathwiseApp({super.key, required this.notificationService});
+
+  final NotificationService notificationService;
 
   @override
   State<PathwiseApp> createState() => _PathwiseAppState();
@@ -43,6 +52,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
   late final AiRoadmapService _ai;
   late final PaymentService _payments;
   late final ApiClient _api;
+  late final ChatService _chat;
 
   @override
   void initState() {
@@ -56,6 +66,7 @@ class _PathwiseAppState extends State<PathwiseApp> {
     _ai = AiRoadmapService();
     _payments = PaymentService();
     _api = ApiClient();
+    _chat = ChatService();
   }
 
   @override
@@ -77,6 +88,8 @@ class _PathwiseAppState extends State<PathwiseApp> {
         Provider.value(value: _ai),
         Provider.value(value: _payments),
         Provider.value(value: _api),
+        Provider.value(value: _chat),
+        Provider.value(value: widget.notificationService),
       ],
       child: AppServices(
         auth: _auth,
@@ -88,6 +101,8 @@ class _PathwiseAppState extends State<PathwiseApp> {
         ai: _ai,
         payments: _payments,
         api: _api,
+        chat: _chat,
+        notifications: widget.notificationService,
         child: ValueListenableBuilder<ThemeMode>(
           valueListenable: themeMode,
           builder: (context, mode, _) => MaterialApp(

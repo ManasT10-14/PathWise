@@ -309,7 +309,9 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
   final _qualificationCtrl = TextEditingController();
   final _linkedinCtrl = TextEditingController();
   final _whyCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController(text: '500');
+  final _priceChatCtrl = TextEditingController(text: '200');
+  final _priceCallCtrl = TextEditingController(text: '400');
+  final _priceVideoCtrl = TextEditingController(text: '500');
 
   @override
   void initState() {
@@ -324,7 +326,9 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
     _qualificationCtrl.dispose();
     _linkedinCtrl.dispose();
     _whyCtrl.dispose();
-    _priceCtrl.dispose();
+    _priceChatCtrl.dispose();
+    _priceCallCtrl.dispose();
+    _priceVideoCtrl.dispose();
     super.dispose();
   }
 
@@ -430,14 +434,46 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
                 ),
               ),
               const SizedBox(height: 14),
-              TextField(
-                controller: _priceCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Preferred Price per Session (INR) *',
-                  hintText: '500',
-                  prefixIcon: Icon(Icons.currency_rupee_rounded, size: 20),
-                ),
-                keyboardType: TextInputType.number,
+              Text('Session Rates (INR) *', style: Theme.of(ctx).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 4),
+              Text('Set your rate for each session type (0-5000)',
+                style: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: Colors.white.withOpacity(0.5))),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _priceChatCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Chat',
+                        prefixIcon: Icon(Icons.chat_rounded, size: 18),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _priceCallCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Audio',
+                        prefixIcon: Icon(Icons.call_rounded, size: 18),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _priceVideoCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Video',
+                        prefixIcon: Icon(Icons.videocam_rounded, size: 18),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 14),
               TextField(
@@ -501,7 +537,9 @@ class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
         qualification: _qualificationCtrl.text.trim(),
         linkedinUrl: _linkedinCtrl.text.trim(),
         whyMentor: _whyCtrl.text.trim(),
-        pricePerSession: int.tryParse(_priceCtrl.text.trim()) ?? 500,
+        priceChat: (int.tryParse(_priceChatCtrl.text.trim()) ?? 200).clamp(0, 5000),
+        priceCall: (int.tryParse(_priceCallCtrl.text.trim()) ?? 400).clamp(0, 5000),
+        priceVideo: (int.tryParse(_priceVideoCtrl.text.trim()) ?? 500).clamp(0, 5000),
       );
       if (mounted) {
         setState(() => _status = 'pending');

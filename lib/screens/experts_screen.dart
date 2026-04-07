@@ -271,7 +271,7 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
                                             ),
                                             const Spacer(),
                                             Text(
-                                              'INR ${e.pricePerSession}',
+                                              'From INR ${e.pricePerSession}',
                                               style: theme.textTheme.labelMedium?.copyWith(
                                                 fontWeight: FontWeight.bold,
                                               ),

@@ -130,21 +130,20 @@ class ExpertDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Book button
+            // Pricing tiers
             GlassCard(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text('Session Rates', style: theme.textTheme.titleSmall),
+                  const SizedBox(height: 12),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Session price', style: theme.textTheme.titleSmall),
-                      Text(
-                        'INR ${expert.pricePerSession}',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      _PriceTile(icon: Icons.chat_rounded, label: 'Chat', price: expert.priceChat),
+                      const SizedBox(width: 8),
+                      _PriceTile(icon: Icons.call_rounded, label: 'Audio', price: expert.priceCall),
+                      const SizedBox(width: 8),
+                      _PriceTile(icon: Icons.videocam_rounded, label: 'Video', price: expert.priceVideo),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -152,7 +151,7 @@ class ExpertDetailScreen extends StatelessWidget {
                     width: double.infinity,
                     child: FilledButton.icon(
                       icon: const Icon(Icons.calendar_today),
-                      label: Text('Book Consultation — INR ${expert.pricePerSession}'),
+                      label: const Text('Book Consultation'),
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => BookConsultationScreen(
@@ -246,6 +245,40 @@ class ExpertDetailScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PriceTile extends StatelessWidget {
+  const _PriceTile({required this.icon, required this.label, required this.price});
+  final IconData icon;
+  final String label;
+  final num price;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppTheme.accent.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.accent.withOpacity(0.15)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 20, color: AppTheme.accent),
+            const SizedBox(height: 6),
+            Text(label, style: theme.textTheme.labelSmall?.copyWith(color: Colors.white.withOpacity(0.5))),
+            const SizedBox(height: 2),
+            Text(
+              'INR $price',
+              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: AppTheme.accent),
+            ),
           ],
         ),
       ),

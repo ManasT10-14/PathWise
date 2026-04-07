@@ -76,12 +76,27 @@ class _BookConsultationScreenState extends State<BookConsultationScreen> {
         expertId: widget.expert.id,
         type: _type,
         status: 'pending',
-        price: widget.expert.pricePerSession,
+        price: widget.expert.priceForType(_type),
         questionLimit: 0,
         scheduledAt: _when,
         createdAt: DateTime.now(),
       );
       final id = await svc.consultations.create(c);
+
+      // Schedule local notifications
+      await svc.notifications.showBookingConfirmation(
+        consultationId: id,
+        expertName: widget.expert.name,
+        sessionType: _type,
+        scheduledAt: _when,
+      );
+      await svc.notifications.scheduleSessionReminder(
+        consultationId: id,
+        expertName: widget.expert.name,
+        sessionType: _type,
+        scheduledAt: _when,
+      );
+
       if (!mounted) return;
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
@@ -125,7 +140,7 @@ class _BookConsultationScreenState extends State<BookConsultationScreen> {
                   Text('Session Price', style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
                   Text(
-                    'INR ${widget.expert.pricePerSession}',
+                    'INR ${widget.expert.priceForType(_type)}',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,

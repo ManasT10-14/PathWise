@@ -14,7 +14,9 @@ import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
 import '../widgets/error_state.dart';
 import '../widgets/skeleton_loader.dart';
+import 'chat_screen.dart';
 import 'review_submit_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ConsultationDetailScreen extends StatefulWidget {
   const ConsultationDetailScreen({
@@ -158,6 +160,17 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
           SnackBar(content: Text('Payment verification failed: ${e.message ?? 'Unknown error'}')),
         );
       }
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null && await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open meeting link')),
+      );
     }
   }
 
@@ -326,7 +339,132 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                     ).animate().fadeIn(delay: 100.ms),
                   ],
 
+                  // Session start section (appears when accepted)
+                  if (c.status == 'accepted') ...[
+                    GlassCard(
+                      glowColor: c.canStartSession() ? AppTheme.accent : null,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                c.canStartSession()
+                                    ? Icons.play_circle_filled_rounded
+                                    : Icons.schedule_rounded,
+                                color: c.canStartSession()
+                                    ? AppTheme.success
+                                    : AppTheme.warning,
+                                size: 22,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  c.canStartSession()
+                                      ? 'Session is ready to start!'
+                                      : 'Session in ${c.minutesUntilSession()} min',
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (c.canStartSession()) ...[
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton.icon(
+                                icon: Icon(
+                                  c.type == 'chat'
+                                      ? Icons.chat_rounded
+                                      : c.type == 'audio'
+                                          ? Icons.call_rounded
+                                          : Icons.videocam_rounded,
+                                ),
+                                label: Text(
+                                  c.type == 'chat'
+                                      ? 'Start Chat'
+                                      : c.type == 'audio'
+                                          ? 'Join Audio Call'
+                                          : 'Join Video Call',
+                                ),
+                                onPressed: () {
+                                  if (c.type == 'chat') {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => ChatScreen(
+                                          consultationId: c.id,
+                                          currentUserId: widget.appUser.uid,
+                                          currentUserName: widget.appUser.name,
+                                          otherUserName: 'Expert',
+                                        ),
+                                      ),
+                                    );
+                                  } else if (c.meetLink != null && c.meetLink!.isNotEmpty) {
+                                    _launchUrl(c.meetLink!);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Meeting link not yet provided by the expert')),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                          // Meet link for audio/video
+                          if (c.type != 'chat' && c.meetLink != null && c.meetLink!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.link_rounded, size: 14, color: AppTheme.accent.withOpacity(0.7)),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    c.meetLink!,
+                                    style: theme.textTheme.bodySmall?.copyWith(color: AppTheme.accent),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: 100.ms),
+                  ],
+
+                  // Expert actions
                   if (canExpertAct && c.status == 'accepted') ...[
+                    const SizedBox(height: 8),
+                    // Meet link input for audio/video sessions
+                    if (c.type != 'chat')
+                      GlassCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Meeting Link', style: theme.textTheme.titleSmall),
+                            const SizedBox(height: 8),
+                            TextField(
+                              decoration: const InputDecoration(
+                                hintText: 'Paste Google Meet or Zoom link',
+                                prefixIcon: Icon(Icons.link_rounded, size: 18),
+                              ),
+                              onSubmitted: (link) async {
+                                if (link.trim().isEmpty) return;
+                                await svc.consultations.updateMeetLink(c.id, link.trim());
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Meeting link saved')),
+                                  );
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: 120.ms),
+                    const SizedBox(height: 8),
                     GlassCard(
                       child: SizedBox(
                         width: double.infinity,
@@ -337,7 +475,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                           child: const Text('Mark completed'),
                         ),
                       ),
-                    ).animate().fadeIn(delay: 100.ms),
+                    ).animate().fadeIn(delay: 140.ms),
                   ],
 
                   if (isUser && c.status == 'completed') ...[

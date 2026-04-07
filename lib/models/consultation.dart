@@ -12,6 +12,7 @@ class Consultation {
     required this.questionLimit,
     required this.scheduledAt,
     required this.createdAt,
+    this.meetLink,
   });
 
   final String id;
@@ -24,6 +25,21 @@ class Consultation {
   final int questionLimit;
   final DateTime? scheduledAt;
   final DateTime? createdAt;
+  final String? meetLink;
+
+  /// Returns true if the session is within 10 minutes of scheduled time or past it.
+  bool canStartSession() {
+    if (scheduledAt == null) return false;
+    if (status != 'accepted') return false;
+    final diff = scheduledAt!.difference(DateTime.now()).inMinutes;
+    return diff <= 10;
+  }
+
+  /// Minutes until session starts (negative if past).
+  int? minutesUntilSession() {
+    if (scheduledAt == null) return null;
+    return scheduledAt!.difference(DateTime.now()).inMinutes;
+  }
 
   static String _cleanStatus(String raw) {
     var s = raw.trim();
@@ -45,9 +61,10 @@ class Consultation {
       type: _cleanStatus(m['type']?.toString() ?? 'chat'),
       status: _cleanStatus(m['status']?.toString() ?? 'pending'),
       price: m['price'] is num ? m['price'] as num : 0,
-      questionLimit: (m['questionLimit'] is num) ? (m['questionLimit'] as num).toInt() : 5,
+      questionLimit: (m['questionLimit'] is num) ? (m['questionLimit'] as num).toInt() : 0,
       scheduledAt: ts(m['scheduledAt']),
       createdAt: ts(m['createdAt']),
+      meetLink: m['meetLink']?.toString(),
     );
   }
 
@@ -60,8 +77,9 @@ class Consultation {
       'status': status,
       'price': price,
       'questionLimit': questionLimit,
-      'scheduledAt': scheduledAt != null ? Timestamp.fromDate(scheduledAt!) : Timestamp.now(),
+      'scheduledAt': scheduledAt != null ? Timestamp.fromDate(scheduledAt!) : null,
       'createdAt': FieldValue.serverTimestamp(),
+      if (meetLink != null) 'meetLink': meetLink,
     };
   }
 }

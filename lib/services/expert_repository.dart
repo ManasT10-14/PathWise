@@ -46,6 +46,7 @@ class ExpertRepository {
       'experience': '',
       'rating': 0.0,
       'pricePerSession': 500,
+      'pricing': {'chat': 500, 'call': 500, 'video': 500},
       'isVerified': false,
       'skills': <String>[],
       'totalReviews': 0,
@@ -86,7 +87,9 @@ class ExpertRepository {
     String qualification = '',
     String linkedinUrl = '',
     String whyMentor = '',
-    int pricePerSession = 500,
+    int priceChat = 500,
+    int priceCall = 500,
+    int priceVideo = 500,
   }) async {
     // Prevent duplicate applications
     final existing = await _applications.where('uid', isEqualTo: uid).limit(1).get();
@@ -106,7 +109,7 @@ class ExpertRepository {
       'qualification': qualification,
       'linkedinUrl': linkedinUrl,
       'whyMentor': whyMentor,
-      'pricePerSession': pricePerSession,
+      'pricing': {'chat': priceChat, 'call': priceCall, 'video': priceVideo},
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
@@ -128,7 +131,10 @@ class ExpertRepository {
     final domain = app['domain'] as String? ?? '';
     final experience = app['experience'] as String? ?? '';
     final skills = (app['skills'] as List?)?.cast<String>() ?? <String>[];
-    final price = app['pricePerSession'] is num ? (app['pricePerSession'] as num).toInt() : 500;
+    final pricing = app['pricing'] is Map ? app['pricing'] as Map : {};
+    final pChat = pricing['chat'] is num ? (pricing['chat'] as num).toInt() : 500;
+    final pCall = pricing['call'] is num ? (pricing['call'] as num).toInt() : 500;
+    final pVideo = pricing['video'] is num ? (pricing['video'] as num).toInt() : 500;
 
     // Create expert profile
     await createForUser(uid: uid, name: name, email: email);
@@ -140,7 +146,8 @@ class ExpertRepository {
         'domain': domain,
         'experience': experience,
         'skills': skills,
-        'pricePerSession': price,
+        'pricing': {'chat': pChat, 'call': pCall, 'video': pVideo},
+        'pricePerSession': pChat, // Legacy field
         'isVerified': true,
       });
     }

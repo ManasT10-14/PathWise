@@ -48,4 +48,8 @@ class ConsultationRepository {
   Future<void> updateStatus(String docId, String status) async {
     await _col.doc(docId).update({'status': status});
   }
+
+  Future<void> updateMeetLink(String docId, String meetLink) async {
+    await _col.doc(docId).update({'meetLink': meetLink});
+  }
 }

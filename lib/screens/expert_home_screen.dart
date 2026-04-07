@@ -121,12 +121,12 @@ class _TabButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: isActive ? Border.all(color: AppTheme.accent.withOpacity(0.3)) : null,
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 15, color: isActive ? AppTheme.accent : (isDark ? Colors.white.withOpacity(0.4) : Colors.black38)),
-              const SizedBox(width: 5),
-              Text(label, style: TextStyle(fontSize: 12, fontWeight: isActive ? FontWeight.w600 : FontWeight.w400, color: isActive ? AppTheme.accent : (isDark ? Colors.white.withOpacity(0.5) : Colors.black45))),
+              Icon(icon, size: 18, color: isActive ? AppTheme.accent : (isDark ? Colors.white.withOpacity(0.4) : Colors.black38)),
+              const SizedBox(height: 3),
+              Text(label, style: TextStyle(fontSize: 10, fontWeight: isActive ? FontWeight.w600 : FontWeight.w400, color: isActive ? AppTheme.accent : (isDark ? Colors.white.withOpacity(0.5) : Colors.black45)), maxLines: 1, overflow: TextOverflow.ellipsis),
             ],
           ),
         ),
@@ -365,11 +365,11 @@ class _ProfileTabState extends State<_ProfileTab> {
                   children: [
                     Row(
                       children: [
-                        Text(widget.expert.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                        Expanded(child: Text(widget.expert.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
                         if (widget.expert.isVerified) ...[const SizedBox(width: 6), const Icon(Icons.verified_rounded, size: 18, color: AppTheme.accentSecondary)],
                       ],
                     ),
-                    Text(widget.expert.email, style: theme.textTheme.bodySmall?.copyWith(color: isDark ? Colors.white.withOpacity(0.5) : Colors.black45)),
+                    Text(widget.expert.email, style: theme.textTheme.bodySmall?.copyWith(color: isDark ? Colors.white.withOpacity(0.5) : Colors.black45), maxLines: 1, overflow: TextOverflow.ellipsis),
                     Row(
                       children: [
                         const Icon(Icons.star_rounded, size: 14, color: Colors.amber),

@@ -8,6 +8,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../models/app_user.dart';
 import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
 import '../widgets/ai_progress_indicator.dart';
@@ -443,7 +444,7 @@ class _StepProgressBar extends StatelessWidget {
                 child: Container(
                   height: 2,
                   color: stepIdx < currentStep
-                      ? Colors.green
+                      ? AppTheme.success
                       : colorScheme.outline.withOpacity(0.3),
                 ),
               );
@@ -455,9 +456,9 @@ class _StepProgressBar extends StatelessWidget {
             return CircleAvatar(
               radius: 16,
               backgroundColor: isCompleted
-                  ? Colors.green
+                  ? AppTheme.success
                   : isActive
-                      ? colorScheme.primary
+                      ? AppTheme.accent
                       : colorScheme.outline.withOpacity(0.3),
               child: isCompleted
                   ? const Icon(Icons.check, size: 16, color: Colors.white)

@@ -9,7 +9,9 @@ import '../models/app_user.dart';
 import '../models/consultation.dart';
 import '../providers/app_services.dart';
 import '../services/payment_service.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
+import '../theme/gradient_background.dart';
 import '../widgets/error_state.dart';
 import '../widgets/skeleton_loader.dart';
 import 'review_submit_screen.dart';
@@ -135,13 +137,13 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
   Color _statusColor(String status, ColorScheme colorScheme) {
     switch (status) {
       case 'pending':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'accepted':
-        return Colors.green;
+        return AppTheme.success;
       case 'completed':
-        return colorScheme.primary;
+        return AppTheme.accent;
       case 'cancelled':
-        return Colors.red;
+        return AppTheme.error;
       default:
         return colorScheme.outline;
     }
@@ -155,7 +157,9 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Consultation')),
-      body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      body: GradientBackground(
+        variant: GradientVariant.accent,
+        child: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection('consultations')
             .doc(widget.consultationId)
@@ -333,6 +337,7 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
             },
           );
         },
+      ),
       ),
     );
   }

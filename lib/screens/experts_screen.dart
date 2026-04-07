@@ -4,7 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../models/app_user.dart';
 import '../models/expert.dart';
 import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
+import '../theme/gradient_background.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton_loader.dart';
 import 'expert_detail_screen.dart';
@@ -52,10 +54,13 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
     final svc = context.svc;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Experts')),
-      body: StreamBuilder<List<Expert>>(
+      body: GradientBackground(
+        variant: GradientVariant.primary,
+        child: StreamBuilder<List<Expert>>(
         stream: svc.experts.watchExperts(),
         builder: (context, snap) {
           if (snap.hasError) {
@@ -82,7 +87,18 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
             children: [
               // Filter bar
               Container(
-                color: colorScheme.surface.withOpacity(0.9),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppTheme.surfaceLight.withOpacity(0.6)
+                      : Colors.white.withOpacity(0.8),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.06)
+                          : Colors.black.withOpacity(0.06),
+                    ),
+                  ),
+                ),
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,6 +293,7 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
             ],
           );
         },
+      ),
       ),
     );
   }

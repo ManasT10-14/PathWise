@@ -257,6 +257,8 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -264,6 +266,8 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

@@ -6,7 +6,9 @@ import '../models/app_user.dart';
 import '../models/consultation.dart';
 import '../models/expert.dart';
 import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
+import '../theme/gradient_background.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton_loader.dart';
 import 'consultation_detail_screen.dart';
@@ -20,13 +22,13 @@ class ExpertHomeScreen extends StatelessWidget {
   Color _statusColor(String status) {
     switch (status) {
       case 'pending':
-        return Colors.orange;
+        return AppTheme.warning;
       case 'accepted':
-        return Colors.green;
+        return AppTheme.success;
       case 'completed':
-        return Colors.blue;
+        return AppTheme.accent;
       case 'cancelled':
-        return Colors.red;
+        return AppTheme.error;
       default:
         return Colors.grey;
     }
@@ -48,7 +50,9 @@ class ExpertHomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: FutureBuilder<Expert?>(
+      body: GradientBackground(
+        variant: GradientVariant.secondary,
+        child: FutureBuilder<Expert?>(
         future: svc.experts.findExpertForUser(uid: appUser.uid, email: appUser.email),
         builder: (context, expertSnap) {
           if (!expertSnap.hasData) {
@@ -216,6 +220,7 @@ class ExpertHomeScreen extends StatelessWidget {
             },
           );
         },
+      ),
       ),
     );
   }

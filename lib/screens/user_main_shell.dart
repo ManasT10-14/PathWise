@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
 import '../models/app_user.dart';
+import '../theme/app_theme.dart';
 import 'home_mode_screen.dart';
 import 'profile_screen.dart';
 
@@ -21,11 +24,12 @@ class _UserMainShellState extends State<UserMainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pages = [
       HomeModeScreen(appUser: widget.appUser),
       ProfileScreen(appUser: widget.appUser, firebaseUser: widget.firebaseUser),
     ];
+
     return Scaffold(
       appBar: _index == 0
           ? null
@@ -35,35 +39,126 @@ class _UserMainShellState extends State<UserMainShell> {
                 ValueListenableBuilder<ThemeMode>(
                   valueListenable: themeMode,
                   builder: (context, mode, _) => IconButton(
-                    icon: Icon(
-                      mode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
-                    ),
+                    icon: Icon(mode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
                     onPressed: () {
-                      themeMode.value = mode == ThemeMode.dark
-                          ? ThemeMode.light
-                          : ThemeMode.dark;
+                      themeMode.value = mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
                     },
                   ),
                 ),
               ],
             ),
-      body: pages[_index],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        backgroundColor: colorScheme.surface.withOpacity(0.95),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        child: KeyedSubtree(
+          key: ValueKey<int>(_index),
+          child: pages[_index],
+        ),
+      ),
+      extendBody: true,
+      bottomNavigationBar: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.black.withOpacity(0.5)
+                  : Colors.white.withOpacity(0.7),
+              border: Border(
+                top: BorderSide(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.08)
+                      : Colors.black.withOpacity(0.06),
+                ),
+              ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _NavItem(
+                      icon: Icons.home_outlined,
+                      activeIcon: Icons.home_rounded,
+                      label: 'Home',
+                      isActive: _index == 0,
+                      onTap: () => setState(() => _index = 0),
+                    ),
+                    _NavItem(
+                      icon: Icons.person_outline_rounded,
+                      activeIcon: Icons.person_rounded,
+                      label: 'Profile',
+                      isActive: _index == 1,
+                      onTap: () => setState(() => _index = 1),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? AppTheme.accent.withOpacity(0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isActive ? activeIcon : icon,
+              size: 22,
+              color: isActive
+                  ? AppTheme.accent
+                  : (isDark ? Colors.white.withOpacity(0.4) : Colors.black45),
+            ),
+            if (isActive) ...[
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: AppTheme.accent,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

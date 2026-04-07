@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
 
@@ -93,10 +95,11 @@ class _ExpertAnnotationScreenState extends State<ExpertAnnotationScreen> {
   Widget _buildSuccessState(ThemeData theme, ColorScheme colorScheme) {
     return Center(
       child: GlassCard(
+        glowColor: AppTheme.success,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.check_circle_outline, size: 56, color: colorScheme.primary),
+            Icon(Icons.check_circle_outline, size: 56, color: AppTheme.success),
             const SizedBox(height: 16),
             Text(
               'Annotation Submitted',
@@ -115,7 +118,10 @@ class _ExpertAnnotationScreenState extends State<ExpertAnnotationScreen> {
             ),
           ],
         ),
-      ),
+      ).animate().fadeIn(duration: 500.ms).scale(
+            begin: const Offset(0.9, 0.9),
+            end: const Offset(1, 1),
+          ),
     );
   }
 
@@ -148,7 +154,7 @@ class _ExpertAnnotationScreenState extends State<ExpertAnnotationScreen> {
               ),
             ],
           ),
-        ),
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.05, end: 0),
         const SizedBox(height: 16),
         GlassCard(
           child: Column(
@@ -178,7 +184,7 @@ class _ExpertAnnotationScreenState extends State<ExpertAnnotationScreen> {
               ),
             ],
           ),
-        ),
+        ).animate().fadeIn(delay: 150.ms, duration: 400.ms).slideY(begin: 0.05, end: 0),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../models/app_user.dart';
+import '../theme/app_theme.dart';
 import '../models/consultation.dart';
 import '../models/expert.dart';
 import '../models/review.dart';
@@ -81,7 +82,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Reject'),
           ),
@@ -128,7 +129,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.error),
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text('Delete'),
           ),
@@ -275,11 +276,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             children: [
                               CircleAvatar(
                                 backgroundColor: e.isVerified
-                                    ? Colors.green.withOpacity(0.15)
-                                    : Colors.orange.withOpacity(0.15),
+                                    ? AppTheme.success.withOpacity(0.15)
+                                    : AppTheme.warning.withOpacity(0.15),
                                 child: Icon(
                                   e.isVerified ? Icons.verified : Icons.pending,
-                                  color: e.isVerified ? Colors.green : Colors.orange,
+                                  color: e.isVerified ? AppTheme.success : AppTheme.warning,
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -303,10 +304,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               Chip(
                                 label: Text(e.isVerified ? 'Verified' : 'Pending'),
                                 backgroundColor: e.isVerified
-                                    ? Colors.green.withOpacity(0.2)
-                                    : Colors.orange.withOpacity(0.2),
+                                    ? AppTheme.success.withOpacity(0.2)
+                                    : AppTheme.warning.withOpacity(0.2),
                                 labelStyle: TextStyle(
-                                  color: e.isVerified ? Colors.green : Colors.orange,
+                                  color: e.isVerified ? AppTheme.success : AppTheme.warning,
                                   fontSize: 11,
                                 ),
                               ),
@@ -327,7 +328,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                   child: OutlinedButton(
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: Colors.red,
-                                      side: const BorderSide(color: Colors.red),
+                                      side: const BorderSide(color: AppTheme.error),
                                     ),
                                     onPressed: () => _rejectExpert(e.id, e.name),
                                     child: const Text('Reject'),
@@ -490,7 +491,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 onPressed: isFlagged ? null : () => _flagReview(r.id),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                                icon: const Icon(Icons.delete_outline, color: AppTheme.error),
                                 tooltip: 'Delete review',
                                 onPressed: () => _deleteReview(r.id),
                               ),

@@ -9,4 +9,4 @@ COPY . .
 
 ENV PORT=8080
 
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1
+CMD ["/bin/sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1"]

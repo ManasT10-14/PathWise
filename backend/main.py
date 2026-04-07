@@ -17,12 +17,22 @@ import json as _json
 import os
 import tempfile as _tmp
 
+# Check for Firebase service account credentials
 _sa_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON", "")
 if _sa_json and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
     _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
     _tf.write(_sa_json)
     _tf.close()
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _tf.name
+
+# Check for separate Vertex AI credentials (if using a dedicated AI service account)
+_vtx_json = os.environ.get("VERTEX_AI_CREDENTIALS_JSON", "")
+if _vtx_json:
+    _vtx_tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+    _vtx_tf.write(_vtx_json)
+    _vtx_tf.close()
+    # This overrides ADC for all Google SDKs including google-genai
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _vtx_tf.name
 
 import uuid
 

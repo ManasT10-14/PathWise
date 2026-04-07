@@ -190,16 +190,16 @@ class ExpertHomeScreen extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => ConsultationDetailScreen(
-                          consultationId: c.id,
-                          appUser: appUser,
-                          expertDocId: expert.id,
-                        ),
-                      ),
-                    ),
-                    child: GlassCard(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => ConsultationDetailScreen(
+                                consultationId: c.id,
+                                appUser: appUser,
+                                expertDocId: expert.id,
+                              ),
+                            ),
+                          ),
+                          child: GlassCard(
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [

@@ -98,6 +98,7 @@ class NotificationService {
           iOS: DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
       debugPrint('Failed to schedule notification: $e');

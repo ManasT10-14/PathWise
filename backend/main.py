@@ -8,6 +8,22 @@ Responsibilities:
   - Per-request correlation ID injection
 """
 
+# ---------------------------------------------------------------------------
+# MUST RUN FIRST: Set up GCP credentials from env var before any Google SDK
+# imports. Railway/Render/etc. don't have GCP metadata server, so the
+# google-genai SDK needs GOOGLE_APPLICATION_CREDENTIALS pointing to a file.
+# ---------------------------------------------------------------------------
+import json as _json
+import os
+import tempfile as _tmp
+
+_sa_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON", "")
+if _sa_json and not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+    _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
+    _tf.write(_sa_json)
+    _tf.close()
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = _tf.name
+
 import uuid
 
 import firebase_admin
@@ -53,17 +69,12 @@ if not firebase_admin._apps:
         _cred = firebase_admin.credentials.Certificate(settings.firebase_service_account)
         firebase_admin.initialize_app(_cred)
         log.info("firebase_initialized", source="service_account_file")
-    elif _sa_json := __import__("os").environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"):
-        # Railway/cloud: service account JSON passed as env var (no file upload)
-        import json as _json, tempfile as _tmp
-        _tf = _tmp.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
-        _tf.write(_sa_json)
-        _tf.close()
-        _cred = firebase_admin.credentials.Certificate(_tf.name)
+    elif os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
+        # Railway/cloud: credentials file created at top of this file from env JSON
+        _cred = firebase_admin.credentials.Certificate(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
         firebase_admin.initialize_app(_cred)
-        log.info("firebase_initialized", source="env_json")
+        log.info("firebase_initialized", source="env_credentials_file")
     else:
-        # Relies on GOOGLE_APPLICATION_CREDENTIALS env var (Application Default Credentials)
         firebase_admin.initialize_app()
         log.info("firebase_initialized", source="application_default_credentials")
 

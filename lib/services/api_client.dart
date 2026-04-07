@@ -13,7 +13,7 @@ class ApiClient {
   }) : _baseUrl = baseUrl ??
             const String.fromEnvironment(
               'API_BASE_URL',
-              defaultValue: 'http://10.0.2.2:8080',
+              defaultValue: 'https://pathwise-1410.up.railway.app/api/v1',
             ) {
     _dio = Dio(BaseOptions(
       baseUrl: _baseUrl,
@@ -73,7 +73,7 @@ class ApiClient {
     required String careerGoals,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/roadmaps/analyze',
+      '/roadmaps/analyze',
       data: {
         'resume_text': resumeText,
         'skills': skills,
@@ -101,7 +101,7 @@ class ApiClient {
     required String consultationId,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/payments/create-order',
+      '/payments/create-order',
       data: {'consultation_id': consultationId},
     );
     return response.data ?? {};
@@ -123,7 +123,7 @@ class ApiClient {
     required String signature,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/payments/verify',
+      '/payments/verify',
       data: {
         'razorpay_order_id': orderId,
         'razorpay_payment_id': paymentId,
@@ -159,7 +159,7 @@ class ApiClient {
     int? stallDays,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/roadmaps/replan',
+      '/roadmaps/replan',
       data: {
         'roadmap_id': roadmapId,
         'current_progress': currentProgress,
@@ -190,7 +190,7 @@ class ApiClient {
     required String annotation,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
-      '/api/v1/roadmaps/annotate',
+      '/roadmaps/annotate',
       data: {
         'roadmap_id': roadmapId,
         'user_id': userId,

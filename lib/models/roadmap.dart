@@ -65,14 +65,23 @@ class Roadmap {
   List<RoadmapStage> get structuredStages {
     final stages = <RoadmapStage>[];
     final labels = ['beginner', 'intermediate', 'advanced'];
+    final stageCount = milestones.length.clamp(1, 10);
+
+    // Distribute ALL resources across stages evenly
+    final resourcesPerStage = <int, List<String>>{};
+    for (var i = 0; i < resources.length; i++) {
+      final bucket = i % stageCount;
+      resourcesPerStage.putIfAbsent(bucket, () => []).add(resources[i]);
+    }
+
     for (var i = 0; i < milestones.length; i++) {
       final level = i < labels.length ? labels[i] : 'stage_${i + 1}';
-      final chunk = resources.length > i
-          ? [resources[i]]
-          : resources.isNotEmpty
-              ? [resources[i % resources.length]]
-              : <String>[];
-      stages.add(RoadmapStage(level: level, title: milestones[i], tasks: const [], resources: chunk));
+      stages.add(RoadmapStage(
+        level: level,
+        title: milestones[i],
+        tasks: const [],
+        resources: resourcesPerStage[i] ?? [],
+      ));
     }
     if (stages.isEmpty) {
       stages.add(

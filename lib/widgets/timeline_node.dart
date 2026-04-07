@@ -42,13 +42,27 @@ class _TimelineNodeState extends State<TimelineNode> {
     return Colors.white.withOpacity(0.25);
   }
 
-  IconData _statusIcon() {
-    if (widget.progress >= 1.0) return Icons.check_rounded;
-    if (widget.isCurrent) return Icons.play_arrow_rounded;
-    return Icons.circle_outlined;
+  /// Extracts a short display name from the milestone title.
+  /// Gemini returns titles like "Beginner — Foundations for ML: core syntax..."
+  /// We take the part after the dash as the short name.
+  String _shortTitle() {
+    final raw = widget.stage.title;
+    // Try splitting on " — " or " -- " (Gemini uses both)
+    for (final sep in [' — ', ' -- ', ': ']) {
+      final idx = raw.indexOf(sep);
+      if (idx > 0 && idx < raw.length - sep.length) {
+        return raw.substring(idx + sep.length).trim();
+      }
+    }
+    return raw;
   }
 
-  String _levelEmoji() {
+  /// Returns the full milestone description for the expanded view.
+  String _fullDescription() {
+    return widget.stage.title;
+  }
+
+  String _levelLabel() {
     switch (widget.stage.level.toLowerCase()) {
       case 'beginner':
         return 'Foundation';
@@ -58,6 +72,35 @@ class _TimelineNodeState extends State<TimelineNode> {
         return 'Mastery';
       default:
         return widget.stage.level.capitalize();
+    }
+  }
+
+  IconData _levelIcon() {
+    switch (widget.stage.level.toLowerCase()) {
+      case 'beginner':
+        return Icons.school_rounded;
+      case 'intermediate':
+        return Icons.trending_up_rounded;
+      case 'advanced':
+        return Icons.rocket_launch_rounded;
+      default:
+        return Icons.circle_outlined;
+    }
+  }
+
+  String _approachTip() {
+    switch (widget.stage.level.toLowerCase()) {
+      case 'beginner':
+        return 'Start here. Focus on understanding core concepts before jumping into projects. '
+            'Follow the resources in order — each builds on the previous one.';
+      case 'intermediate':
+        return 'You have the basics. Now close your skill gaps with focused practice. '
+            'Build small projects to solidify each concept before moving forward.';
+      case 'advanced':
+        return 'Push for mastery. Take on end-to-end projects, contribute to open source, '
+            'and prepare for real-world scenarios. Teach what you learn.';
+      default:
+        return 'Work through the resources below and track your progress as you complete each topic.';
     }
   }
 
@@ -78,7 +121,6 @@ class _TimelineNodeState extends State<TimelineNode> {
               width: 48,
               child: Column(
                 children: [
-                  // Top connector
                   Container(
                     width: 2,
                     height: 16,
@@ -95,9 +137,7 @@ class _TimelineNodeState extends State<TimelineNode> {
                             ),
                           ),
                   ),
-                  // Node circle
                   _buildNodeCircle(statusColor),
-                  // Bottom connector
                   Expanded(
                     child: Container(
                       width: 2,
@@ -121,12 +161,9 @@ class _TimelineNodeState extends State<TimelineNode> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Header (always visible)
                       _buildHeader(theme, statusColor),
-                      // Progress bar
                       _buildProgressBar(statusColor),
-                      // Expandable content
-                      if (_expanded) _buildExpandedContent(theme),
+                      if (_expanded) _buildExpandedContent(theme, isDark),
                     ],
                   ),
                 ),
@@ -173,58 +210,61 @@ class _TimelineNodeState extends State<TimelineNode> {
       onTap: () => setState(() => _expanded = !_expanded),
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 12, 10),
-        child: Row(
+        padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Level badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: statusColor.withOpacity(0.3)),
-              ),
-              child: Text(
-                _levelEmoji(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: statusColor,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+            // Top row: level badge + progress + expand icon
+            Row(
+              children: [
+                Icon(_levelIcon(), size: 16, color: statusColor),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _levelLabel(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: statusColor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            // Title
-            Expanded(
-              child: Text(
-                widget.stage.title,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  height: 1.3,
+                const Spacer(),
+                Text(
+                  '${(widget.progress * 100).round()}%',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+                const SizedBox(width: 4),
+                AnimatedRotation(
+                  turns: _expanded ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 200),
+                  child: Icon(
+                    Icons.expand_more_rounded,
+                    size: 20,
+                    color: Colors.white.withOpacity(0.4),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            // Progress percentage
+            const SizedBox(height: 8),
+            // Stage title — show short version when collapsed, full when expanded
             Text(
-              '${(widget.progress * 100).round()}%',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.w700,
+              _expanded ? _fullDescription() : _shortTitle(),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.4,
               ),
-            ),
-            const SizedBox(width: 4),
-            // Expand icon
-            AnimatedRotation(
-              turns: _expanded ? 0.5 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                Icons.expand_more_rounded,
-                size: 20,
-                color: Colors.white.withOpacity(0.4),
-              ),
+              maxLines: _expanded ? 10 : 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -234,7 +274,7 @@ class _TimelineNodeState extends State<TimelineNode> {
 
   Widget _buildProgressBar(Color color) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: LinearProgressIndicator(
@@ -247,37 +287,71 @@ class _TimelineNodeState extends State<TimelineNode> {
     );
   }
 
-  Widget _buildExpandedContent(ThemeData theme) {
+  Widget _buildExpandedContent(ThemeData theme, bool isDark) {
+    final muted = isDark ? Colors.white.withOpacity(0.5) : Colors.black54;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          // How to approach this stage
+          _SectionHeader(icon: Icons.lightbulb_outline_rounded, title: 'How to approach', color: AppTheme.warning),
+          const SizedBox(height: 6),
+          Text(
+            _approachTip(),
+            style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5),
+          ),
+
+          const SizedBox(height: 16),
+
+          // What you'll learn (extracted from the title)
+          _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
+          const SizedBox(height: 6),
+          ..._extractFocusAreas().map((area) => Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Icon(Icons.arrow_right_rounded, size: 16, color: AppTheme.accentSecondary.withOpacity(0.7)),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        area,
+                        style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.4),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+
           // Resources
           if (widget.stage.resources.isNotEmpty) ...[
-            Text(
-              'Resources',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: AppTheme.accentSecondary,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-            ),
+            const SizedBox(height: 16),
+            _SectionHeader(icon: Icons.menu_book_rounded, title: 'Resources', color: AppTheme.accent),
             const SizedBox(height: 6),
             ...widget.stage.resources.map((r) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
+                  padding: const EdgeInsets.only(bottom: 6),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.link_rounded, size: 14, color: AppTheme.accent.withOpacity(0.7)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(Icons.link_rounded, size: 14, color: AppTheme.accent.withOpacity(0.6)),
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          r.length > 50 ? '${r.substring(0, 50)}...' : r,
+                          r,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.white.withOpacity(0.6),
+                            color: AppTheme.accent.withOpacity(0.8),
+                            height: 1.3,
                           ),
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -285,47 +359,125 @@ class _TimelineNodeState extends State<TimelineNode> {
                   ),
                 )),
           ],
+
           // Progress slider
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Text(
-                'Update progress',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withOpacity(0.5),
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '${(widget.progress * 100).round()}%',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: AppTheme.accent,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          SliderTheme(
-            data: SliderThemeData(
-              trackHeight: 6,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-              activeTrackColor: AppTheme.accent,
-              inactiveTrackColor: Colors.white.withOpacity(0.06),
-              thumbColor: AppTheme.accent,
-              overlayColor: AppTheme.accent.withOpacity(0.15),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Slider(
-              value: widget.progress.clamp(0, 1),
-              onChanged: widget.onProgressChanged,
-              min: 0,
-              max: 1,
-              divisions: 20,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.speed_rounded, size: 16, color: AppTheme.accent.withOpacity(0.6)),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Your progress',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: muted,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${(widget.progress * 100).round()}%',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: AppTheme.accent,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 6,
+                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                    activeTrackColor: AppTheme.accent,
+                    inactiveTrackColor: Colors.white.withOpacity(0.06),
+                    thumbColor: AppTheme.accent,
+                    overlayColor: AppTheme.accent.withOpacity(0.15),
+                  ),
+                  child: Slider(
+                    value: widget.progress.clamp(0, 1),
+                    onChanged: widget.onProgressChanged,
+                    min: 0,
+                    max: 1,
+                    divisions: 20,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     ).animate().fadeIn(duration: 200.ms);
+  }
+
+  /// Extracts focus areas from the milestone title by parsing after colons/dashes.
+  List<String> _extractFocusAreas() {
+    final raw = widget.stage.title;
+
+    // Try to extract comma-separated topics from the title
+    // e.g., "Beginner — Foundations: core syntax, tooling, and delivery of a small project."
+    final colonIdx = raw.indexOf(':');
+    if (colonIdx > 0 && colonIdx < raw.length - 1) {
+      final afterColon = raw.substring(colonIdx + 1).trim();
+      // Split on commas and ", and "
+      final parts = afterColon
+          .replaceAll(', and ', ', ')
+          .replaceAll(' and ', ', ')
+          .split(',')
+          .map((s) => s.trim().replaceAll(RegExp(r'[.]$'), ''))
+          .where((s) => s.isNotEmpty && s.length > 2)
+          .toList();
+      if (parts.isNotEmpty) return parts;
+    }
+
+    // Fallback: split on semicolons
+    final semiParts = raw
+        .split(';')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty && s.length > 5)
+        .toList();
+    if (semiParts.length > 1) return semiParts;
+
+    // Final fallback — just show the whole description as a single point
+    return [raw];
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    required this.icon,
+    required this.title,
+    required this.color,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: color),
+        const SizedBox(width: 6),
+        Text(
+          title.toUpperCase(),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: color,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.8,
+                fontSize: 10,
+              ),
+        ),
+      ],
+    );
   }
 }

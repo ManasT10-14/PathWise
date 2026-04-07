@@ -21,6 +21,8 @@ class RoadmapRepository {
     required List<String> milestones,
     required List<String> resources,
     required String timeline,
+    List<String>? skillGaps,
+    String? goalAnalysis,
   }) async {
     final doc = _col.doc();
     await doc.set({
@@ -30,11 +32,17 @@ class RoadmapRepository {
       'milestones': milestones,
       'resources': resources,
       'timeline': timeline,
+      if (skillGaps != null)
+        'skillGaps': skillGaps
+            .map((g) => {'skill': g, 'confidence': 0.5})
+            .toList(),
+      if (goalAnalysis != null) 'goalAnalysis': goalAnalysis,
       'stageProgress': <String, double>{
         'beginner': 0,
         'intermediate': 0,
         'advanced': 0,
       },
+      'replan_version': 1,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });

@@ -5,8 +5,6 @@ import '../models/app_user.dart';
 import '../models/expert.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
-import '../widgets/error_state.dart';
-import '../widgets/skeleton_loader.dart';
 import 'book_consultation_screen.dart';
 
 class ExpertDetailScreen extends StatelessWidget {

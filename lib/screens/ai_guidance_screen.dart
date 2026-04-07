@@ -195,6 +195,8 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
           milestones: analysis.milestones,
           resources: analysis.resources,
           timeline: analysis.timeline,
+          skillGaps: analysis.skillGaps,
+          goalAnalysis: analysis.goalAnalysis,
         );
       }
 
@@ -220,7 +222,6 @@ class _AiGuidanceScreenState extends State<AiGuidanceScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     if (_working) {
       return Scaffold(

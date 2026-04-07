@@ -397,8 +397,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             // ----------------------------------------------------------------
             // Tab 4: Reviews (ADM-03)
             // ----------------------------------------------------------------
-            StreamBuilder<List<Review>>(
-              stream: svc.reviews.watchAll(),
+            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance.collection('reviews').snapshots(),
               builder: (context, snap) {
                 if (!snap.hasData) {
                   return Padding(
@@ -406,8 +406,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     child: SkeletonLoader.list(itemCount: 4),
                   );
                 }
-                final list = snap.data!;
-                if (list.isEmpty) {
+                final docs = snap.data!.docs;
+                if (docs.isEmpty) {
                   return EmptyStateWidget(
                     title: 'No Reviews',
                     subtitle: 'No reviews submitted yet',
@@ -416,14 +416,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.all(16),
-                  itemCount: list.length,
+                  itemCount: docs.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, i) {
-                    final r = list[i];
-                    // Review does not expose 'flagged' in the model — stream
-                    // the raw Firestore snapshot separately to check it.
-                    // For display purposes, use a red-tinted card wrapper.
-                    const isFlagged = false; // Snapshot flagging shown via _flagReview Firestore write.
+                    final raw = docs[i].data();
+                    final r = Review.fromFirestore(docs[i].id, raw);
+                    final isFlagged = raw['flagged'] == true;
                     return GlassCard(
                       padding: const EdgeInsets.all(12),
                       child: Row(
@@ -458,11 +456,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                     ),
                                     if (isFlagged) ...[
                                       const SizedBox(width: 6),
-                                      const Chip(
-                                        label: Text('Flagged'),
-                                        backgroundColor: Color(0x33FF5252),
-                                        labelStyle: TextStyle(
-                                          color: Colors.red,
+                                      Chip(
+                                        label: const Text('Flagged'),
+                                        backgroundColor: AppTheme.error.withOpacity(0.15),
+                                        labelStyle: const TextStyle(
+                                          color: AppTheme.error,
                                           fontSize: 10,
                                         ),
                                         visualDensity: VisualDensity.compact,
@@ -485,7 +483,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               IconButton(
                                 icon: Icon(
                                   Icons.flag,
-                                  color: isFlagged ? Colors.red : colorScheme.onSurface.withOpacity(0.5),
+                                  color: isFlagged ? AppTheme.error : colorScheme.onSurface.withOpacity(0.5),
                                 ),
                                 tooltip: 'Flag review',
                                 onPressed: isFlagged ? null : () => _flagReview(r.id),

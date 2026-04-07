@@ -134,7 +134,7 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
     if (stages.isEmpty) return 0.0;
     final total = stages.fold<double>(
       0.0,
-      (sum, s) => sum + (_progress[s.level] ?? 0.0),
+      (acc, s) => acc + (_progress[s.level] ?? 0.0),
     );
     return total / stages.length;
   }
@@ -320,6 +320,8 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                             fontWeight: FontWeight.bold,
                             color: colorScheme.primary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -327,6 +329,8 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurface.withOpacity(0.8),
                           ),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),

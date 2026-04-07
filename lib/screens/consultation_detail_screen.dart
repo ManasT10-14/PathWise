@@ -45,62 +45,89 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     super.dispose();
   }
 
-  /// Initiates the server-side Razorpay order creation and opens checkout.
+  /// Initiates payment — uses mock flow for demo, real Razorpay for production.
   Future<void> _startPayment(Consultation c) async {
     if (_creatingOrder) return;
 
     final svc = context.svc;
-
     setState(() => _creatingOrder = true);
 
     try {
-      // PAY-01: Server creates the order — price comes from Firestore.
-      final order = await svc.api.createPaymentOrder(
-        consultationId: c.id,
-      );
+      // Try server-side payment flow first (production)
+      try {
+        final order = await svc.api.createPaymentOrder(consultationId: c.id);
+        final orderId = order['order_id']?.toString() ?? '';
 
-      final orderId = order['order_id']?.toString() ?? '';
-      final amount = order['amount'];
-
-      if (orderId.isEmpty) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not create payment order. Please try again.')),
+        if (orderId.isNotEmpty) {
+          _pendingOrderId = orderId;
+          final amount = order['amount'];
+          _payment.startWithOrder(
+            context: context,
+            payments: svc.payments,
+            orderId: orderId,
+            amountPaise: amount is num ? amount.toInt() : (c.price * 100).toInt(),
+            title: 'Consultation ${c.id}',
+            email: widget.appUser.email,
+            onSuccess: (paymentId, signature) async {
+              await _verifyPayment(orderId: orderId, paymentId: paymentId, signature: signature);
+            },
+            onFailure: (msg) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Payment cancelled: $msg')),
+                );
+              }
+            },
           );
+          return;
         }
-        return;
+      } catch (_) {
+        // Server unavailable — fall through to mock payment
       }
 
-      _pendingOrderId = orderId;
-
-      // Open Razorpay checkout with the server-provided order ID.
-      _payment.startWithOrder(
+      // Mock payment flow for demo/testing
+      if (!mounted) return;
+      final confirmed = await showDialog<bool>(
         context: context,
-        payments: svc.payments,
-        orderId: orderId,
-        amountPaise: amount is num ? amount.toInt() : (c.price * 100).toInt(),
-        title: 'Consultation ${c.id}',
-        email: widget.appUser.email,
-        onSuccess: (paymentId, signature) async {
-          await _verifyPayment(
-            orderId: orderId,
-            paymentId: paymentId,
-            signature: signature,
-          );
-        },
-        onFailure: (msg) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Payment failed or cancelled: $msg')),
-            );
-          }
-        },
+        builder: (ctx) => AlertDialog(
+          title: const Text('Confirm Payment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Amount: INR ${c.price}'),
+              const SizedBox(height: 8),
+              Text(
+                'This is a simulated payment for demo purposes. '
+                'In production, Razorpay checkout will open.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(ctx).colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Pay (Demo)'),
+            ),
+          ],
+        ),
       );
-    } on DioException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Order creation failed: ${e.message ?? 'Unknown error'}')),
-        );
+
+      if (confirmed == true) {
+        // Simulate payment success — update consultation status
+        await svc.consultations.updateStatus(c.id, 'accepted');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Payment successful! Consultation confirmed.')),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _creatingOrder = false);

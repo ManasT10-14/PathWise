@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 
 class AiProgressIndicator extends StatelessWidget {
@@ -14,25 +15,27 @@ class AiProgressIndicator extends StatelessWidget {
   final int totalSteps;
 
   static const List<String> _steps = [
-    'Analyzing your background...',
-    'Identifying skill gaps...',
-    'Building your roadmap...',
-    'Curating resources...',
+    'Analyzing your background',
+    'Identifying skill gaps',
+    'Building your roadmap',
+    'Curating resources',
   ];
 
   static const List<IconData> _icons = [
-    Icons.person_search,
-    Icons.psychology,
-    Icons.map_outlined,
-    Icons.library_books,
+    Icons.person_search_rounded,
+    Icons.psychology_rounded,
+    Icons.map_rounded,
+    Icons.library_books_rounded,
   ];
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return GlassCard(
+      glowColor: AppTheme.accent,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: List.generate(_steps.length, (i) {
@@ -41,49 +44,81 @@ class AiProgressIndicator extends StatelessWidget {
 
           Widget leading;
           if (isCompleted) {
-            leading = const Icon(Icons.check_circle, color: Colors.green, size: 24);
+            leading = Container(
+              width: 28,
+              height: 28,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.success,
+              ),
+              child: const Icon(Icons.check_rounded, color: Colors.white, size: 16),
+            );
           } else if (isActive) {
-            leading = SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: colorScheme.primary,
+            leading = Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppTheme.accent, width: 2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppTheme.accent,
+                ),
               ),
             );
           } else {
-            leading = Icon(
-              Icons.radio_button_unchecked,
-              color: colorScheme.onSurface.withOpacity(0.3),
-              size: 24,
+            leading = Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDark ? Colors.white.withOpacity(0.15) : Colors.black12,
+                  width: 2,
+                ),
+              ),
             );
           }
 
           final stepRow = Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(
               children: [
                 leading,
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 Expanded(
                   child: Text(
                     _steps[i],
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
                       color: isActive
-                          ? colorScheme.primary
+                          ? (isDark ? Colors.white : Colors.black87)
                           : isCompleted
-                              ? colorScheme.onSurface
-                              : colorScheme.onSurface.withOpacity(0.4),
+                              ? (isDark ? Colors.white.withOpacity(0.7) : Colors.black54)
+                              : (isDark ? Colors.white.withOpacity(0.25) : Colors.black26),
                     ),
                   ),
                 ),
-                Icon(
-                  _icons[i],
-                  size: 18,
-                  color: isActive
-                      ? colorScheme.primary
-                      : colorScheme.onSurface.withOpacity(0.3),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? AppTheme.accent.withOpacity(0.12)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    _icons[i],
+                    size: 18,
+                    color: isActive
+                        ? AppTheme.accent
+                        : isCompleted
+                            ? AppTheme.success.withOpacity(0.6)
+                            : (isDark ? Colors.white.withOpacity(0.15) : Colors.black12),
+                  ),
                 ),
               ],
             ),
@@ -96,7 +131,7 @@ class AiProgressIndicator extends StatelessWidget {
                 stepRow
                     .animate()
                     .fadeIn()
-                    .shimmer(duration: 1500.ms, color: colorScheme.primary.withOpacity(0.3))
+                    .shimmer(duration: 1800.ms, color: AppTheme.accent.withOpacity(0.2))
               else if (isCompleted)
                 stepRow.animate().fadeIn(duration: 200.ms)
               else
@@ -104,13 +139,16 @@ class AiProgressIndicator extends StatelessWidget {
               if (i < _steps.length - 1)
                 Row(
                   children: [
-                    const SizedBox(width: 11),
+                    const SizedBox(width: 13),
                     Container(
                       width: 2,
-                      height: 16,
-                      color: isCompleted
-                          ? Colors.green
-                          : colorScheme.onSurface.withOpacity(0.15),
+                      height: 12,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(1),
+                        color: isCompleted
+                            ? AppTheme.success.withOpacity(0.5)
+                            : (isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.06)),
+                      ),
                     ),
                   ],
                 ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 class ConfidenceBadge extends StatelessWidget {
   const ConfidenceBadge({
     super.key,
@@ -11,29 +13,30 @@ class ConfidenceBadge extends StatelessWidget {
   final String? label;
 
   Color _badgeColor() {
-    if (confidence >= 0.8) return Colors.green;
-    if (confidence >= 0.5) return Colors.orange;
-    return Colors.red;
+    if (confidence >= 0.8) return AppTheme.success;
+    if (confidence >= 0.5) return AppTheme.warning;
+    return AppTheme.error;
   }
 
   @override
   Widget build(BuildContext context) {
-    final badgeColor = _badgeColor();
-    final labelText = label ?? '${(confidence * 100).round()}%';
+    final color = _badgeColor();
+    final displayText = label ?? '${(confidence * 100).round()}%';
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(0.15),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: badgeColor.withOpacity(0.5)),
+        border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Text(
-        labelText,
+        displayText,
         style: TextStyle(
-          color: badgeColor,
-          fontWeight: FontWeight.bold,
+          color: color,
           fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.3,
         ),
       ),
     );

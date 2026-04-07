@@ -411,17 +411,14 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
           ...List.generate(stages.length, (i) {
             final stage = stages[i];
             final progress = _progress[stage.level] ?? 0.0;
-            return SizedBox(
-              height: 200 + (stage.tasks.isNotEmpty ? 80.0 : 0),
-              child: TimelineNode(
-                stage: stage,
-                progress: progress,
-                isFirst: i == 0,
-                isLast: i == stages.length - 1,
-                isCurrent: _isCurrentStage(i, stages),
-                onProgressChanged: (val) => _updateProgress(stage.level, val),
-                index: i,
-              ),
+            return TimelineNode(
+              stage: stage,
+              progress: progress,
+              isFirst: i == 0,
+              isLast: i == stages.length - 1,
+              isCurrent: _isCurrentStage(i, stages),
+              onProgressChanged: (val) => _updateProgress(stage.level, val),
+              index: i,
             );
           }),
         ],

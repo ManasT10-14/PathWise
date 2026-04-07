@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../main.dart';
 import '../models/app_user.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
 import 'ai_guidance_screen.dart';
@@ -16,20 +17,21 @@ class HomeModeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final greeting = _greeting();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guidance'),
+        title: const Text('Pathwise'),
         actions: [
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeMode,
             builder: (context, mode, _) => IconButton(
               icon: Icon(
-                mode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode,
+                mode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
               ),
               onPressed: () {
-                themeMode.value = mode == ThemeMode.dark
-                    ? ThemeMode.light
-                    : ThemeMode.dark;
+                themeMode.value = mode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
               },
             ),
           ),
@@ -38,97 +40,242 @@ class HomeModeScreen extends StatelessWidget {
       body: GradientBackground(
         variant: GradientVariant.primary,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
           children: [
+            // Hero greeting
             Text(
-              'Hello, ${appUser.name}',
-              style: theme.textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
+              '$greeting,',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: isDark ? Colors.white.withOpacity(0.5) : Colors.black54,
+              ),
+            ).animate().fadeIn(duration: 400.ms),
+            const SizedBox(height: 2),
             Text(
-              'Choose how you want to grow next.',
+              appUser.name.isNotEmpty ? appUser.name.split(' ').first : 'there',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.5,
+              ),
+            ).animate().fadeIn(delay: 100.ms, duration: 400.ms).slideX(begin: -0.03, end: 0),
+            const SizedBox(height: 6),
+            Text(
+              'What would you like to do today?',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: isDark ? Colors.white.withOpacity(0.4) : Colors.black45,
               ),
-            ),
-            const SizedBox(height: 24),
-            _GlassModeCard(
+            ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
+
+            const SizedBox(height: 32),
+
+            // AI Guidance card
+            _FeatureCard(
               index: 0,
-              title: 'AI Guidance',
-              subtitle:
-                  'Upload or paste your résumé, add skills and goals — get a tailored roadmap with milestones and resources.',
-              icon: Icons.psychology_outlined,
+              icon: Icons.auto_awesome_rounded,
+              iconColor: AppTheme.accent,
+              glowColor: AppTheme.accent,
+              title: 'AI Career Guidance',
+              subtitle: 'Get a personalized learning roadmap powered by Gemini AI. '
+                  'Analyzes your skills, detects gaps, and builds a path to your dream role.',
+              ctaText: 'Start Analysis',
               onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => AiGuidanceScreen(appUser: appUser),
-                ),
+                MaterialPageRoute<void>(builder: (_) => AiGuidanceScreen(appUser: appUser)),
               ),
             ),
+
             const SizedBox(height: 16),
-            _GlassModeCard(
+
+            // Expert card
+            _FeatureCard(
               index: 1,
-              title: 'Human Expert Consultation',
-              subtitle:
-                  'Browse verified experts, pick chat / audio / video, pay securely, and book a session.',
-              icon: Icons.groups_2_outlined,
+              icon: Icons.person_search_rounded,
+              iconColor: AppTheme.accentSecondary,
+              glowColor: AppTheme.accentSecondary,
+              title: 'Expert Consultation',
+              subtitle: 'Connect with verified domain experts for personalized mentorship. '
+                  'Book sessions, get career advice, and validate your learning path.',
+              ctaText: 'Browse Experts',
               onTap: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => ExpertsScreen(appUser: appUser),
-                ),
+                MaterialPageRoute<void>(builder: (_) => ExpertsScreen(appUser: appUser)),
               ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // Quick stats row
+            Row(
+              children: [
+                Expanded(
+                  child: _QuickStat(
+                    index: 0,
+                    icon: Icons.school_rounded,
+                    label: 'Skills',
+                    value: '${appUser.skills.length}',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _QuickStat(
+                    index: 1,
+                    icon: Icons.interests_rounded,
+                    label: 'Interests',
+                    value: '${appUser.interests.length}',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _QuickStat(
+                    index: 2,
+                    icon: Icons.trending_up_rounded,
+                    label: 'Role',
+                    value: appUser.careerGoals.isNotEmpty ? 'Set' : '—',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+
+  String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
 }
 
-class _GlassModeCard extends StatelessWidget {
-  const _GlassModeCard({
+class _FeatureCard extends StatelessWidget {
+  const _FeatureCard({
     required this.index,
+    required this.icon,
+    required this.iconColor,
+    required this.glowColor,
     required this.title,
     required this.subtitle,
-    required this.icon,
+    required this.ctaText,
     required this.onTap,
   });
 
   final int index;
+  final IconData icon;
+  final Color iconColor;
+  final Color glowColor;
   final String title;
   final String subtitle;
-  final IconData icon;
+  final String ctaText;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: GlassCard(
+        glowColor: glowColor,
         padding: const EdgeInsets.all(20),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 36, color: theme.colorScheme.primary),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(height: 6),
-                  Text(subtitle, style: theme.textTheme.bodySmall),
-                ],
+                  child: Icon(icon, size: 24, color: iconColor),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 20,
+                  color: isDark ? Colors.white.withOpacity(0.3) : Colors.black26,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.3,
               ),
             ),
-            Icon(Icons.chevron_right, color: theme.colorScheme.outline),
+            const SizedBox(height: 8),
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isDark ? Colors.white.withOpacity(0.5) : Colors.black54,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                ctaText,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: iconColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ],
         ),
-      ).animate().fadeIn(delay: (index * 100).ms).slideX(begin: -0.1, end: 0),
+      ).animate().fadeIn(delay: (index * 150 + 300).ms, duration: 500.ms).slideY(begin: 0.08, end: 0),
     );
+  }
+}
+
+class _QuickStat extends StatelessWidget {
+  const _QuickStat({
+    required this.index,
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final int index;
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      child: Column(
+        children: [
+          Icon(icon, size: 20, color: AppTheme.accent.withOpacity(0.7)),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: isDark ? Colors.white.withOpacity(0.4) : Colors.black45,
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: (index * 100 + 600).ms, duration: 400.ms).scale(
+          begin: const Offset(0.9, 0.9),
+          end: const Offset(1, 1),
+        );
   }
 }

@@ -19,6 +19,30 @@ class ExpertRepository {
     await _col.doc(expertDocId).update({'isVerified': verified});
   }
 
+  /// Update expert profile fields. Only non-null values are written.
+  Future<void> updateExpertProfile(
+    String expertDocId, {
+    String? domain,
+    String? experience,
+    List<String>? skills,
+    int? priceChat,
+    int? priceCall,
+    int? priceVideo,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (domain != null) updates['domain'] = domain;
+    if (experience != null) updates['experience'] = experience;
+    if (skills != null) updates['skills'] = skills;
+    if (priceChat != null || priceCall != null || priceVideo != null) {
+      updates['pricing'] = {
+        if (priceChat != null) 'chat': priceChat,
+        if (priceCall != null) 'call': priceCall,
+        if (priceVideo != null) 'video': priceVideo,
+      };
+    }
+    if (updates.isNotEmpty) await _col.doc(expertDocId).update(updates);
+  }
+
   Future<void> updateRatingStats(String expertDocId, double newAvg, int totalReviews) async {
     await _col.doc(expertDocId).update({
       'rating': newAvg,

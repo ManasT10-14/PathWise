@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../models/app_user.dart';
 import '../theme/app_theme.dart';
 import 'home_mode_screen.dart';
+import 'journey_screen.dart';
 import 'profile_screen.dart';
 
 class UserMainShell extends StatefulWidget {
@@ -26,6 +27,7 @@ class _UserMainShellState extends State<UserMainShell> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final pages = [
       HomeModeScreen(appUser: widget.appUser),
+      JourneyScreen(appUser: widget.appUser),
       ProfileScreen(appUser: widget.appUser, firebaseUser: widget.firebaseUser),
     ];
 
@@ -71,11 +73,18 @@ class _UserMainShellState extends State<UserMainShell> {
                       onTap: () => setState(() => _index = 0),
                     ),
                     _NavItem(
+                      icon: Icons.route_outlined,
+                      activeIcon: Icons.route_rounded,
+                      label: 'Journey',
+                      isActive: _index == 1,
+                      onTap: () => setState(() => _index = 1),
+                    ),
+                    _NavItem(
                       icon: Icons.person_outline_rounded,
                       activeIcon: Icons.person_rounded,
                       label: 'Profile',
-                      isActive: _index == 1,
-                      onTap: () => setState(() => _index = 1),
+                      isActive: _index == 2,
+                      onTap: () => setState(() => _index = 2),
                     ),
                   ],
                 ),
@@ -112,7 +121,7 @@ class _NavItem extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
               ? AppTheme.accent.withOpacity(0.12)
@@ -130,12 +139,12 @@ class _NavItem extends StatelessWidget {
                   : (isDark ? Colors.white.withOpacity(0.4) : Colors.black45),
             ),
             if (isActive) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 label,
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppTheme.accent,
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),

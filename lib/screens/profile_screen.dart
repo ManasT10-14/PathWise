@@ -1,18 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:intl/intl.dart';
 
 import '../main.dart';
 import '../models/app_user.dart';
-import '../models/consultation.dart';
-import '../models/roadmap.dart';
 import '../providers/app_services.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
-import '../widgets/empty_state.dart';
-import 'consultation_detail_screen.dart';
-import 'roadmap_detail_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.appUser, required this.firebaseUser});
@@ -280,91 +274,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ).animate().fadeIn(delay: 250.ms),
 
-                  const SizedBox(height: 24),
-
-                  // Past consultations
-                  Text('Past Consultations', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  StreamBuilder<List<Consultation>>(
-                    stream: svc.consultations.watchForUser(widget.appUser.uid),
-                    builder: (context, snap) {
-                      final list = snap.data ?? [];
-                      if (list.isEmpty) {
-                        return EmptyStateWidget(
-                          title: 'No Consultations',
-                          subtitle: 'Book a session with an expert to get started',
-                          icon: Icons.calendar_today_outlined,
-                        );
-                      }
-                      return Column(
-                        children: list
-                            .map(
-                              (c) => GlassCard(
-                                padding: const EdgeInsets.all(12),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(c.status),
-                                  subtitle: Text(
-                                    '${c.type} • ${c.scheduledAt != null ? DateFormat.yMMMd().add_jm().format(c.scheduledAt!) : '—'}',
-                                  ),
-                                  trailing: const Icon(Icons.chevron_right),
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => ConsultationDetailScreen(
-                                        consultationId: c.id,
-                                        appUser: widget.appUser,
-                                        expertDocId: c.expertId,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Roadmaps
-                  Text('Generated Roadmaps', style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  StreamBuilder<List<Roadmap>>(
-                    stream: svc.roadmaps.watchForUser(widget.appUser.uid),
-                    builder: (context, snap) {
-                      final list = snap.data ?? [];
-                      if (list.isEmpty) {
-                        return EmptyStateWidget(
-                          title: 'No Roadmaps Yet',
-                          subtitle: 'Try AI Guidance to generate your personalized roadmap',
-                          icon: Icons.map_outlined,
-                        );
-                      }
-                      return Column(
-                        children: list
-                            .map(
-                              (r) => GlassCard(
-                                padding: const EdgeInsets.all(12),
-                                child: ListTile(
-                                  contentPadding: EdgeInsets.zero,
-                                  title: Text(r.targetRole.isEmpty ? 'Roadmap' : r.targetRole),
-                                  subtitle: Text(r.timeline),
-                                  trailing: const Icon(Icons.chevron_right),
-                                  onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => RoadmapDetailScreen(roadmapId: r.id),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 32),
+                  // Bottom padding for nav bar
+                  const SizedBox(height: 80),
                 ]),
               ),
             ),

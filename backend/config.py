@@ -14,10 +14,11 @@ class Settings(BaseSettings):
     Example: GCP_PROJECT_ID=pathwise-aedc5 in .env or shell environment.
     """
 
-    # --- Google Cloud / Vertex AI ---
-    gcp_project_id: str
+    # --- Google Cloud / Gemini AI ---
+    gcp_project_id: str = ""
     gcp_location: str = "us-central1"
     gemini_model: str = "gemini-2.5-flash"
+    gemini_api_key: str = ""
 
     # --- Firebase Admin SDK ---
     # Path to service account JSON file. If empty, falls back to

@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../main.dart';
 import '../models/app_user.dart';
 import '../providers/app_services.dart';
+import '../theme/app_theme.dart';
 import '../theme/glass_card.dart';
 import '../theme/gradient_background.dart';
 
@@ -246,6 +247,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   const SizedBox(height: 16),
 
+                  // Apply as Expert (only for regular users)
+                  if (widget.appUser.role == UserRole.user) ...[
+                    _ExpertApplicationCard(appUser: widget.appUser),
+                    const SizedBox(height: 16),
+                  ],
+
                   // Settings
                   GlassCard(
                     padding: EdgeInsets.zero,
@@ -283,5 +290,213 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+}
+
+class _ExpertApplicationCard extends StatefulWidget {
+  const _ExpertApplicationCard({required this.appUser});
+  final AppUser appUser;
+
+  @override
+  State<_ExpertApplicationCard> createState() => _ExpertApplicationCardState();
+}
+
+class _ExpertApplicationCardState extends State<_ExpertApplicationCard> {
+  String? _status; // null = loading, 'none' = no application
+  bool _submitting = false;
+  final _domainCtrl = TextEditingController();
+  final _experienceCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStatus();
+  }
+
+  @override
+  void dispose() {
+    _domainCtrl.dispose();
+    _experienceCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadStatus() async {
+    final status = await context.svc.experts.getApplicationStatus(widget.appUser.uid);
+    if (mounted) setState(() => _status = status ?? 'none');
+  }
+
+  Future<void> _showApplicationDialog() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Apply as Expert'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Share your expertise with learners. Your application will be reviewed by an admin.',
+                style: TextStyle(fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _domainCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Domain / Specialty',
+                  hintText: 'e.g. Machine Learning, System Design',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _experienceCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Experience',
+                  hintText: 'e.g. 5 years in ML at Google',
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Submit Application'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _submitting = true);
+    try {
+      await context.svc.experts.submitApplication(
+        uid: widget.appUser.uid,
+        name: widget.appUser.name,
+        email: widget.appUser.email,
+        domain: _domainCtrl.text.trim(),
+        experience: _experienceCtrl.text.trim(),
+        skills: widget.appUser.skills,
+      );
+      if (mounted) {
+        setState(() => _status = 'pending');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Application submitted! An admin will review it.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    if (_status == null) return const SizedBox.shrink(); // Loading
+
+    return GlassCard(
+      glowColor: _status == 'pending' ? AppTheme.warning : AppTheme.accentSecondary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentSecondary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.workspace_premium_rounded, size: 20, color: AppTheme.accentSecondary),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Become an Expert',
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      'Share your knowledge and earn',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? Colors.white.withOpacity(0.5) : Colors.black45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (_status == 'none')
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _submitting ? null : _showApplicationDialog,
+                icon: _submitting
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.send_rounded, size: 18),
+                label: Text(_submitting ? 'Submitting...' : 'Apply Now'),
+              ),
+            )
+          else if (_status == 'pending')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: AppTheme.warning.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppTheme.warning.withOpacity(0.3)),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.hourglass_top_rounded, size: 16, color: AppTheme.warning),
+                  SizedBox(width: 6),
+                  Text(
+                    'Application pending review',
+                    style: TextStyle(color: AppTheme.warning, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ],
+              ),
+            )
+          else if (_status == 'rejected')
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: AppTheme.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.close_rounded, size: 16, color: AppTheme.error),
+                  SizedBox(width: 6),
+                  Text(
+                    'Application not approved',
+                    style: TextStyle(color: AppTheme.error, fontWeight: FontWeight.w600, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 200.ms);
   }
 }

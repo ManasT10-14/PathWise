@@ -168,8 +168,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.analytics_outlined), label: 'Analytics'),
           NavigationDestination(icon: Icon(Icons.people_outline), label: 'Users'),
+          NavigationDestination(icon: Icon(Icons.pending_actions_outlined), label: 'Applicants'),
           NavigationDestination(icon: Icon(Icons.badge_outlined), label: 'Experts'),
-          NavigationDestination(icon: Icon(Icons.event_note_outlined), label: 'Consults'),
           NavigationDestination(icon: Icon(Icons.reviews_outlined), label: 'Reviews'),
         ],
       ),
@@ -255,7 +255,145 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
 
             // ----------------------------------------------------------------
-            // Tab 2: Experts (ADM-02)
+            // Tab 2: Expert Applications
+            // ----------------------------------------------------------------
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: svc.experts.watchApplications(),
+              builder: (context, snap) {
+                if (!snap.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SkeletonLoader.list(itemCount: 3),
+                  );
+                }
+                final apps = snap.data!;
+                if (apps.isEmpty) {
+                  return EmptyStateWidget(
+                    title: 'No Applications',
+                    subtitle: 'Expert applications from users will appear here',
+                    icon: Icons.pending_actions_outlined,
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: apps.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) {
+                    final app = apps[i];
+                    final status = app['status'] as String? ?? 'pending';
+                    final isPending = status == 'pending';
+                    final statusColor = isPending
+                        ? AppTheme.warning
+                        : status == 'approved'
+                            ? AppTheme.success
+                            : AppTheme.error;
+
+                    return GlassCard(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: colorScheme.primaryContainer,
+                                child: Text(
+                                  (app['name'] as String? ?? '?')[0].toUpperCase(),
+                                  style: TextStyle(color: colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      app['name'] as String? ?? 'Unknown',
+                                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                                    ),
+                                    Text(
+                                      app['email'] as String? ?? '',
+                                      style: theme.textTheme.bodySmall?.copyWith(
+                                        color: colorScheme.onSurface.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  status.toUpperCase(),
+                                  style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
+                          ),
+                          if ((app['domain'] as String?)?.isNotEmpty == true) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.work_outline, size: 14, color: colorScheme.onSurface.withOpacity(0.5)),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    '${app['domain']} • ${app['experience'] ?? ''}',
+                                    style: theme.textTheme.bodySmall,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (isPending) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: FilledButton.icon(
+                                    onPressed: () async {
+                                      await svc.experts.approveApplication(app['id'] as String, app);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Expert approved and profile created!')),
+                                        );
+                                      }
+                                    },
+                                    icon: const Icon(Icons.check_rounded, size: 18),
+                                    label: const Text('Approve'),
+                                    style: FilledButton.styleFrom(backgroundColor: AppTheme.success),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      await svc.experts.rejectApplication(app['id'] as String);
+                                    },
+                                    icon: const Icon(Icons.close_rounded, size: 18),
+                                    label: const Text('Reject'),
+                                    style: OutlinedButton.styleFrom(foregroundColor: AppTheme.error),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    ).animate().fadeIn(delay: (i * 60).ms);
+                  },
+                );
+              },
+            ),
+
+            // ----------------------------------------------------------------
+            // Tab 3: Experts (ADM-02)
             // ----------------------------------------------------------------
             StreamBuilder<List<Expert>>(
               stream: svc.experts.watchExperts(),

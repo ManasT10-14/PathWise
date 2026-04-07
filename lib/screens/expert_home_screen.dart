@@ -200,140 +200,82 @@ class ExpertHomeScreen extends StatelessWidget {
                             ),
                           ),
                           child: GlassCard(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundColor: statusColor.withOpacity(0.15),
-                            child: Icon(
-                              Icons.person_outline,
-                              color: statusColor,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
                               children: [
-                                // Show learner name
-                                FutureBuilder(
-                                  future: svc.users.fetchUser(c.userId),
-                                  builder: (ctx, userSnap) {
-                                    final learnerName = userSnap.data?.name ?? 'Learner';
-                                    return Text(
-                                      learnerName,
-                                      style: theme.textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    );
-                                  },
+                                CircleAvatar(
+                                  radius: 20,
+                                  backgroundColor: statusColor.withOpacity(0.15),
+                                  child: Icon(Icons.person_outline, color: statusColor, size: 20),
                                 ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        '${c.type.toUpperCase()} session',
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: colorScheme.onSurface.withOpacity(0.6),
-                                        ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      FutureBuilder(
+                                        future: svc.users.fetchUser(c.userId),
+                                        builder: (ctx, userSnap) {
+                                          final name = userSnap.data?.name ?? 'Learner';
+                                          return Text(name, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis);
+                                        },
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: statusColor.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: statusColor.withOpacity(0.5)),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text('${c.type.toUpperCase()} session', style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.6))),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: statusColor.withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(color: statusColor.withOpacity(0.5)),
+                                            ),
+                                            child: Text(c.status, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
                                       ),
-                                      child: Text(
-                                        c.status,
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (c.scheduledAt != null)
-                                  Text(
-                                    DateFormat.yMMMd().add_jm().format(c.scheduledAt!),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withOpacity(0.6),
-                                    ),
-                                  ),
-                                Text(
-                                  'INR ${c.price}',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: colorScheme.primary,
-                                    fontWeight: FontWeight.bold,
+                                      if (c.scheduledAt != null)
+                                        Text(DateFormat.yMMMd().add_jm().format(c.scheduledAt!), style: theme.textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.6))),
+                                      Text('INR ${c.price}', style: theme.textTheme.labelMedium?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold)),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          c.status == 'completed'
-                              ? Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.chevron_right, color: colorScheme.outline),
-                                    const SizedBox(height: 4),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        // Look up the learner's latest roadmap
-                                        final roadmapSnap = await svc.roadmaps
-                                            .watchForUser(c.userId)
-                                            .first;
-                                        if (roadmapSnap.isEmpty) {
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('This learner has no roadmap yet'),
-                                              ),
-                                            );
-                                          }
-                                          return;
-                                        }
-                                        final latestRoadmap = roadmapSnap.first;
-                                        if (!context.mounted) return;
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute<void>(
-                                            builder: (_) => ExpertAnnotationScreen(
-                                              roadmapId: latestRoadmap.id,
-                                              learnerId: c.userId,
-                                              consultationId: c.id,
+                                c.status == 'completed'
+                                    ? Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.chevron_right, color: colorScheme.outline),
+                                          const SizedBox(height: 4),
+                                          GestureDetector(
+                                            onTap: () async {
+                                              final roadmapSnap = await svc.roadmaps.watchForUser(c.userId).first;
+                                              if (roadmapSnap.isEmpty) {
+                                                if (context.mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('This learner has no roadmap yet')));
+                                                }
+                                                return;
+                                              }
+                                              if (!context.mounted) return;
+                                              Navigator.of(context).push(MaterialPageRoute<void>(
+                                                builder: (_) => ExpertAnnotationScreen(roadmapId: roadmapSnap.first.id, learnerId: c.userId, consultationId: c.id),
+                                              ));
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(color: colorScheme.primaryContainer, borderRadius: BorderRadius.circular(8)),
+                                              child: Text('Annotate', style: TextStyle(color: colorScheme.onPrimaryContainer, fontSize: 10, fontWeight: FontWeight.bold)),
                                             ),
                                           ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: colorScheme.primaryContainer,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          'Annotate',
-                                          style: TextStyle(
-                                            color: colorScheme.onPrimaryContainer,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Icon(Icons.chevron_right, color: colorScheme.outline),
-                        ],
-                      ),
-                    ).animate().fadeIn(delay: (i * 80).ms).slideY(begin: 0.05, end: 0),
+                                        ],
+                                      )
+                                    : Icon(Icons.chevron_right, color: colorScheme.outline),
+                              ],
+                            ),
+                          ).animate().fadeIn(delay: (i * 80).ms).slideY(begin: 0.05, end: 0),
+                        ),
                       );
                     }),
                   const SizedBox(height: 80),

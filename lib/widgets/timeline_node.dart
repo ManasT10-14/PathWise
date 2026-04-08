@@ -43,13 +43,12 @@ class _TimelineNodeState extends State<TimelineNode> {
     return Colors.white.withOpacity(0.25);
   }
 
-  /// Extracts the meaningful part of the milestone title.
-  /// Strips the "Beginner — " / "Intermediate — " prefix if present.
-  String _shortTitle() {
+  String _cleanTitle() {
     final raw = widget.stage.title;
+    // Strip level prefix like "Beginner — " or "Intermediate -- "
     for (final sep in [' — ', ' -- ', ' - ']) {
       final idx = raw.indexOf(sep);
-      if (idx > 0 && idx < 30) {
+      if (idx > 0 && idx < 25) {
         return raw.substring(idx + sep.length).trim();
       }
     }
@@ -85,16 +84,13 @@ class _TimelineNodeState extends State<TimelineNode> {
   String _approachTip() {
     switch (widget.stage.level.toLowerCase()) {
       case 'beginner':
-        return 'Start here. Focus on understanding core concepts before jumping into projects. '
-            'Follow the resources in order — each builds on the previous one.';
+        return 'Start here. Focus on understanding core concepts before jumping into practice. Follow the resources in order.';
       case 'intermediate':
-        return 'You have the basics. Now close your skill gaps with focused practice. '
-            'Build small projects to solidify each concept before moving forward.';
+        return 'You have the basics. Now close your skill gaps with focused practice. Build small projects to solidify each concept.';
       case 'advanced':
-        return 'Push for mastery. Take on end-to-end projects, contribute to open source, '
-            'and prepare for real-world scenarios. Teach what you learn.';
+        return 'Push for mastery. Take on end-to-end challenges, seek feedback, and prepare for real-world scenarios.';
       default:
-        return 'Work through the resources below and track your progress as you complete each topic.';
+        return 'Work through the tasks below and track your progress as you complete each one.';
     }
   }
 
@@ -112,7 +108,7 @@ class _TimelineNodeState extends State<TimelineNode> {
           children: [
             // Timeline spine
             SizedBox(
-              width: 48,
+              width: 44,
               child: Column(
                 children: [
                   Container(
@@ -154,6 +150,7 @@ class _TimelineNodeState extends State<TimelineNode> {
                   padding: EdgeInsets.zero,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       _buildHeader(theme, statusColor),
                       _buildProgressBar(statusColor),
@@ -200,6 +197,8 @@ class _TimelineNodeState extends State<TimelineNode> {
   }
 
   Widget _buildHeader(ThemeData theme, Color statusColor) {
+    final taskCount = widget.stage.tasks.length;
+
     return GestureDetector(
       onTap: () => setState(() => _expanded = !_expanded),
       behavior: HitTestBehavior.opaque,
@@ -225,7 +224,6 @@ class _TimelineNodeState extends State<TimelineNode> {
                       color: statusColor,
                       fontWeight: FontWeight.w700,
                       fontSize: 10,
-                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -241,45 +239,28 @@ class _TimelineNodeState extends State<TimelineNode> {
                 AnimatedRotation(
                   turns: _expanded ? 0.5 : 0,
                   duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    Icons.expand_more_rounded,
-                    size: 20,
-                    color: Colors.white.withOpacity(0.4),
-                  ),
+                  child: Icon(Icons.expand_more_rounded, size: 20, color: Colors.white.withOpacity(0.4)),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            // Stage title — show cleaned version when collapsed, full when expanded
+            // Stage title
             Text(
-              _expanded ? widget.stage.title : _shortTitle(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                height: 1.5,
+              _cleanTitle(),
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                height: 1.4,
               ),
             ),
-            // Show task tags when collapsed (if tasks exist)
-            if (!_expanded && widget.stage.tasks.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 4,
-                runSpacing: 4,
-                children: widget.stage.tasks.take(4).map((t) => Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppTheme.accent.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        t,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppTheme.accent.withOpacity(0.7),
-                          fontSize: 10,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    )).toList(),
+            // Task count hint when collapsed
+            if (!_expanded && taskCount > 0) ...[
+              const SizedBox(height: 6),
+              Text(
+                '$taskCount tasks to complete  •  Tap to expand',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: AppTheme.accent.withOpacity(0.6),
+                  fontSize: 10,
+                ),
               ),
             ],
           ],
@@ -312,56 +293,42 @@ class _TimelineNodeState extends State<TimelineNode> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // How to approach this stage
+          // How to approach
           _SectionHeader(icon: Icons.lightbulb_outline_rounded, title: 'How to approach', color: AppTheme.warning),
           const SizedBox(height: 6),
-          Text(
-            _approachTip(),
-            style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5),
-          ),
+          Text(_approachTip(), style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5)),
 
           const SizedBox(height: 16),
 
-          // What to focus on — show tasks if available, else parse from title
+          // Tasks
           if (widget.stage.tasks.isNotEmpty) ...[
-            _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
-            const SizedBox(height: 6),
-            ...widget.stage.tasks.map((task) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
+            _SectionHeader(icon: Icons.checklist_rounded, title: 'Tasks (${widget.stage.tasks.length})', color: AppTheme.accentSecondary),
+            const SizedBox(height: 8),
+            ...widget.stage.tasks.asMap().entries.map((entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(Icons.check_circle_outline_rounded, size: 14, color: AppTheme.accentSecondary.withOpacity(0.7)),
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          task,
-                          style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5),
+                      Container(
+                        width: 20,
+                        height: 20,
+                        margin: const EdgeInsets.only(top: 1),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppTheme.accentSecondary.withOpacity(0.4), width: 1.5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${entry.key + 1}',
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppTheme.accentSecondary.withOpacity(0.7)),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                )),
-          ] else ...[
-            _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
-            const SizedBox(height: 6),
-            ..._extractFocusAreas().map((area) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Icon(Icons.arrow_right_rounded, size: 16, color: AppTheme.accentSecondary.withOpacity(0.7)),
-                      ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          area,
-                          style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.4),
+                          entry.value,
+                          style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5),
                         ),
                       ),
                     ],
@@ -369,17 +336,16 @@ class _TimelineNodeState extends State<TimelineNode> {
                 )),
           ],
 
-          // Resources (clickable)
+          // Resources
           if (widget.stage.resources.isNotEmpty) ...[
             const SizedBox(height: 16),
-            _SectionHeader(icon: Icons.menu_book_rounded, title: 'Resources', color: AppTheme.accent),
-            const SizedBox(height: 6),
+            _SectionHeader(icon: Icons.menu_book_rounded, title: 'Resources (${widget.stage.resources.length})', color: AppTheme.accent),
+            const SizedBox(height: 8),
             ...widget.stage.resources.map((r) {
-              // Extract title and URL if format is "Title (URL)" or just URL
               final urlMatch = RegExp(r'(https?://\S+)').firstMatch(r);
-              final url = urlMatch?.group(0);
-              final title = url != null ? r.replaceAll(url, '').replaceAll('()', '').trim() : r;
-              final displayTitle = title.isNotEmpty ? title : (url ?? r);
+              final url = urlMatch?.group(0)?.replaceAll(RegExp(r'[)\]]+$'), '');
+              final rawTitle = url != null ? r.replaceAll(url, '').replaceAll(RegExp(r'[()\[\]]'), '').trim() : r;
+              final displayTitle = rawTitle.isNotEmpty ? rawTitle : (url ?? r);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -400,37 +366,25 @@ class _TimelineNodeState extends State<TimelineNode> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          url != null ? Icons.open_in_new_rounded : Icons.link_rounded,
-                          size: 14,
-                          color: AppTheme.accent.withOpacity(0.7),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Icon(
+                            url != null ? Icons.open_in_new_rounded : Icons.link_rounded,
+                            size: 14,
+                            color: AppTheme.accent.withOpacity(0.7),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                displayTitle,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: url != null ? AppTheme.accent : muted,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: url != null ? TextDecoration.underline : null,
-                                  decorationColor: AppTheme.accent.withOpacity(0.4),
-                                  height: 1.4,
-                                ),
-                              ),
-                              if (url != null && title.isNotEmpty)
-                                Text(
-                                  url,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: muted.withOpacity(0.6),
-                                    fontSize: 10,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                            ],
+                          child: Text(
+                            displayTitle,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: url != null ? AppTheme.accent : muted,
+                              fontWeight: FontWeight.w500,
+                              decoration: url != null ? TextDecoration.underline : null,
+                              decorationColor: AppTheme.accent.withOpacity(0.4),
+                              height: 1.4,
+                            ),
                           ),
                         ),
                       ],
@@ -455,21 +409,9 @@ class _TimelineNodeState extends State<TimelineNode> {
                   children: [
                     Icon(Icons.speed_rounded, size: 16, color: AppTheme.accent.withOpacity(0.6)),
                     const SizedBox(width: 6),
-                    Text(
-                      'Your progress',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: muted,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    Text('Your progress', style: theme.textTheme.labelSmall?.copyWith(color: muted, fontWeight: FontWeight.w600)),
                     const Spacer(),
-                    Text(
-                      '${(widget.progress * 100).round()}%',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: AppTheme.accent,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    Text('${(widget.progress * 100).round()}%', style: theme.textTheme.labelMedium?.copyWith(color: AppTheme.accent, fontWeight: FontWeight.w700)),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -499,16 +441,11 @@ class _TimelineNodeState extends State<TimelineNode> {
     ).animate().fadeIn(duration: 200.ms);
   }
 
-  /// Extracts focus areas from the milestone title by parsing after colons/dashes.
   List<String> _extractFocusAreas() {
     final raw = widget.stage.title;
-
-    // Try to extract comma-separated topics from the title
-    // e.g., "Beginner — Foundations: core syntax, tooling, and delivery of a small project."
     final colonIdx = raw.indexOf(':');
     if (colonIdx > 0 && colonIdx < raw.length - 1) {
       final afterColon = raw.substring(colonIdx + 1).trim();
-      // Split on commas and ", and "
       final parts = afterColon
           .replaceAll(', and ', ', ')
           .replaceAll(' and ', ', ')
@@ -518,27 +455,12 @@ class _TimelineNodeState extends State<TimelineNode> {
           .toList();
       if (parts.isNotEmpty) return parts;
     }
-
-    // Fallback: split on semicolons
-    final semiParts = raw
-        .split(';')
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty && s.length > 5)
-        .toList();
-    if (semiParts.length > 1) return semiParts;
-
-    // Final fallback — just show the whole description as a single point
     return [raw];
   }
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.icon,
-    required this.title,
-    required this.color,
-  });
-
+  const _SectionHeader({required this.icon, required this.title, required this.color});
   final IconData icon;
   final String title;
   final Color color;
@@ -549,14 +471,18 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: color),
         const SizedBox(width: 6),
-        Text(
-          title.toUpperCase(),
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: color,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.8,
-                fontSize: 10,
-              ),
+        Expanded(
+          child: Text(
+            title.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  fontSize: 10,
+                ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

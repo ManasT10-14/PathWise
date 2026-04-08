@@ -25,6 +25,7 @@ def plan_roadmap(
     goal: GoalAnalysis,
     gaps: SkillGapAnalysis,
     career_goals: str,
+    interests: list[str] | None = None,
 ) -> RoadmapPlan:
     """Create a phased learning roadmap from goal analysis and skill gaps.
 
@@ -58,6 +59,7 @@ def plan_roadmap(
         target_role=goal.target_role,
         skill_gaps=skill_gaps_formatted,
         strengths=", ".join(gaps.strengths) if gaps.strengths else "Not specified",
+        interests=", ".join(interests) if interests else "Not specified",
         timeframe_months=goal.timeframe_months,
         career_goals=career_goals or "Not specified",
     )

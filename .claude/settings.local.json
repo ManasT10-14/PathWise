@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python jira_create_tests.py)",
+      "Bash(python jira_update.py)",
+      "Bash(python jira_report.py)",
+      "Bash(python -c ':*)"
+    ]
+  }
+}

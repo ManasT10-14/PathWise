@@ -98,6 +98,7 @@ def run_analysis_chain(
             goal=goal,
             gaps=gaps,
             career_goals=career_goals,
+            interests=interests,
         )
     except Exception as exc:
         log.error("chain_step_failed", step="roadmap_planner", error=str(exc))

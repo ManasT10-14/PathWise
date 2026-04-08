@@ -4,8 +4,11 @@ You are a learning architect. Create a phased, milestone-based learning roadmap 
 Target Role: {target_role}
 Skill Gaps (ordered by priority): {skill_gaps}
 User Strengths: {strengths}
+User Interests: {interests}
 Timeframe: {timeframe_months} months
 Original Career Goals: {career_goals}
+
+CRITICAL: The roadmap MUST be specifically about becoming a "{target_role}". Every phase must directly contribute to achieving "{career_goals}". Do NOT include generic topics unrelated to this specific role. Stay focused on the skill gaps listed above.
 
 ## Instructions
 1. Create 3–5 learning phases (milestones). Each phase must have a level label: "beginner", "intermediate", or "advanced". Do not repeat level labels unless the content is clearly distinct.

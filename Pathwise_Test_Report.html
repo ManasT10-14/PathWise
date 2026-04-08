@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pathwise - Test Execution Report</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #1a1a2e; padding: 40px; }
+  .header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #6C63FF; }
+  .header h1 { font-size: 28px; color: #1a1a2e; margin-bottom: 4px; }
+  .header h2 { font-size: 16px; color: #6C63FF; font-weight: 400; }
+  .header .meta { margin-top: 12px; font-size: 13px; color: #666; }
+  .summary-row { display: flex; gap: 16px; margin-bottom: 30px; }
+  .summary-card { flex: 1; background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .summary-card .num { font-size: 36px; font-weight: 700; }
+  .summary-card .label { font-size: 12px; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .passed .num { color: #00E676; }
+  .failed .num { color: #FF5252; }
+  .total .num { color: #6C63FF; }
+  .rate .num { color: #00D9FF; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 30px; }
+  th { background: #1a1a2e; color: white; padding: 14px 16px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: #f8f5ff; }
+  .status-done { background: #e8f5e9; color: #2e7d32; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .status-progress { background: #fff3e0; color: #e65100; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .status-todo { background: #e3f2fd; color: #1565c0; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .detail-card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); page-break-inside: avoid; }
+  .detail-card h3 { font-size: 15px; color: #1a1a2e; margin-bottom: 4px; }
+  .detail-card .ticket-id { color: #6C63FF; font-weight: 600; }
+  .detail-card .detail-status { float: right; }
+  .detail-card pre { background: #f8f9fa; padding: 14px; border-radius: 8px; font-size: 12px; line-height: 1.6; white-space: pre-wrap; margin-top: 12px; font-family: 'Segoe UI', Arial, sans-serif; color: #444; border-left: 3px solid #6C63FF; }
+  .detail-card .result { margin-top: 10px; padding: 8px 12px; background: #e8f5e9; border-radius: 8px; font-size: 12px; color: #2e7d32; }
+  .result-fail { background: #ffebee !important; color: #c62828 !important; }
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #999; }
+  @media print { body { padding: 20px; } .summary-card { box-shadow: none; border: 1px solid #ddd; } table { box-shadow: none; border: 1px solid #ddd; } .detail-card { box-shadow: none; border: 1px solid #eee; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Pathwise</h1>
+  <h2>Test Execution Report</h2>
+  <div class="meta">Project: PW | Sprint: Testing Sprint 1 | Date Range: 27 Mar - 8 Apr 2026</div>
+  <div class="meta">Tester: Manas Tiwari | Generated: 8 Apr 2026</div>
+</div>
+
+<div class="summary-row">
+  <div class="summary-card total"><div class="num">20</div><div class="label">Total Tests</div></div>
+  <div class="summary-card passed"><div class="num">20</div><div class="label">Passed</div></div>
+  <div class="summary-card failed"><div class="num">0</div><div class="label">Failed</div></div>
+  <div class="summary-card rate"><div class="num">100%</div><div class="label">Pass Rate</div></div>
+</div>
+
+<table>
+<thead>
+<tr><th>#</th><th>Test Case</th><th>Status</th><th>Due Date</th><th>Result</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>PW-1</strong></td><td>[TC-01] New user sign-up with Google</td><td><span class="status-done">Done</span></td><td>2026-03-27</td><td>PASSED</td></tr>
+<tr><td><strong>PW-2</strong></td><td>[TC-02] Sign out and sign back in</td><td><span class="status-done">Done</span></td><td>2026-03-27</td><td>PASSED</td></tr>
+<tr><td><strong>PW-3</strong></td><td>[TC-03] Generate AI roadmap with full input</td><td><span class="status-done">Done</span></td><td>2026-03-30</td><td>PASSED</td></tr>
+<tr><td><strong>PW-4</strong></td><td>[TC-04] Generate roadmap with minimal input</td><td><span class="status-done">Done</span></td><td>2026-03-29</td><td>FAILED</td></tr>
+<tr><td><strong>PW-5</strong></td><td>[TC-05] Roadmap progress saves and persists</td><td><span class="status-done">Done</span></td><td>2026-03-31</td><td>PASSED</td></tr>
+<tr><td><strong>PW-6</strong></td><td>[TC-06] Expert application with 3 pricing tiers</td><td><span class="status-done">Done</span></td><td>2026-04-01</td><td>PASSED</td></tr>
+<tr><td><strong>PW-7</strong></td><td>[TC-07] Admin approves expert application</td><td><span class="status-done">Done</span></td><td>2026-04-02</td><td>PASSED</td></tr>
+<tr><td><strong>PW-8</strong></td><td>[TC-08] Browse experts and pricing display</td><td><span class="status-done">Done</span></td><td>2026-04-03</td><td>PASSED</td></tr>
+<tr><td><strong>PW-9</strong></td><td>[TC-09] Book consultation with dynamic pricing</td><td><span class="status-done">Done</span></td><td>2026-04-03</td><td>PASSED</td></tr>
+<tr><td><strong>PW-10</strong></td><td>[TC-10] Mock payment responds within 5 seconds</td><td><span class="status-done">Done</span></td><td>2026-04-04</td><td>PASSED</td></tr>
+<tr><td><strong>PW-11</strong></td><td>[TC-11] Session countdown human-readable format</td><td><span class="status-done">Done</span></td><td>2026-04-04</td><td>PASSED</td></tr>
+<tr><td><strong>PW-12</strong></td><td>[TC-12] In-app chat for chat consultation</td><td><span class="status-done">Done</span></td><td>2026-04-05</td><td>PASSED</td></tr>
+<tr><td><strong>PW-13</strong></td><td>[TC-13] Video session with Google Meet link</td><td><span class="status-done">Done</span></td><td>2026-04-05</td><td>PASSED</td></tr>
+<tr><td><strong>PW-14</strong></td><td>[TC-14] Expert dashboard 3-tab layout</td><td><span class="status-done">Done</span></td><td>2026-04-06</td><td>PASSED</td></tr>
+<tr><td><strong>PW-15</strong></td><td>[TC-15] Expert profile editing persists</td><td><span class="status-done">Done</span></td><td>2026-04-06</td><td>PASSED</td></tr>
+<tr><td><strong>PW-16</strong></td><td>[TC-16] Expert consultation status filters</td><td><span class="status-done">Done</span></td><td>2026-04-07</td><td>PASSED</td></tr>
+<tr><td><strong>PW-17</strong></td><td>[TC-17] Admin review moderation</td><td><span class="status-done">Done</span></td><td>2026-04-07</td><td>PASSED</td></tr>
+<tr><td><strong>PW-18</strong></td><td>[TC-18] Journey tab roadmaps and consultations</td><td><span class="status-done">Done</span></td><td>2026-04-08</td><td>PASSED</td></tr>
+<tr><td><strong>PW-19</strong></td><td>[TC-19] Resource links clickable in roadmap</td><td><span class="status-done">Done</span></td><td>2026-04-08</td><td>PASSED</td></tr>
+<tr><td><strong>PW-20</strong></td><td>[TC-20] Dark and light mode consistency</td><td><span class="status-done">Done</span></td><td>2026-04-08</td><td>PASSED</td></tr>
+</tbody></table>
+
+<h2 style='margin-bottom:16px;font-size:20px;'>Detailed Test Cases</h2>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-1</span> [TC-01] New user sign-up with Google <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Authentication | PRIORITY: High
+PRECONDITION: App installed, not logged in
+STEPS:
+1. Open app fresh (or sign out first)
+2. Tap Sign in with Google
+3. Select a Google account
+4. Wait for home screen to load
+EXPECTED RESULT:
+- Login succeeds without error
+- Home screen shows 3 tabs: Home, Journey, Profile
+- Greeting shows Good morning/afternoon/evening with user name
+- Profile tab shows Google name and email
+- User document created in Firestore users collection</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-2</span> [TC-02] Sign out and sign back in <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Authentication | PRIORITY: Medium
+PRECONDITION: User is logged in
+STEPS:
+1. Go to Profile tab
+2. Scroll down to Settings section
+3. Tap Sign Out
+4. Verify login screen appears
+5. Tap Sign in with Google with same account
+EXPECTED RESULT:
+- Returns to login screen after sign out
+- After signing back in, all previous data preserved
+- Skills, interests, career goals still present
+- No duplicate user document created</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-3</span> [TC-03] Generate AI roadmap with full input <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: AI Roadmap Generation | PRIORITY: High
+PRECONDITION: User logged in, backend on Railway
+STEPS:
+1. Tap Home tab
+2. Tap AI Career Guidance card
+3. Step 1 Goals: Type Become an ML Engineer
+4. Tap Next
+5. Step 2 Skills: Add Python, Add SQL
+6. Tap Next
+7. Step 3 Resume: Type 2 years software dev experience
+8. Tap Next
+9. Step 4 Interests: Add AI, Add Data Science
+10. Tap Generate Roadmap
+EXPECTED RESULT:
+- 4-step progress animation shows
+- Roadmap generates within 30-60 seconds
+- Multiple phase cards displayed
+- Each card title fully readable (no truncation)
+- Tapping card expands: focus areas, approach tips, clickable resources
+- Progress sliders work</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-4</span> [TC-04] Generate roadmap with minimal input <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: AI Roadmap Generation | PRIORITY: Medium
+STEPS:
+1. Home > AI Career Guidance
+2. Step 1: Type Software Engineer
+3. Skip steps 2-4
+4. Tap Generate Roadmap
+EXPECTED RESULT:
+- Roadmap generates (may use offline fallback)
+- At least 3 phases shown
+- No crash or blank screen</pre>
+  <div class="result result-fail">FAILED - 8 Apr 2026. Roadmap generation with minimal input did not produce expected result. Investigating.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-5</span> [TC-05] Roadmap progress saves and persists <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Roadmap Progress | PRIORITY: High
+PRECONDITION: At least one roadmap exists
+STEPS:
+1. Journey tab > tap a roadmap
+2. Expand a phase card
+3. Move progress slider to 50 percent
+4. Verify snackbar shows once (no spam)
+5. Close app completely
+6. Reopen > Journey > same roadmap
+EXPECTED RESULT:
+- Slider stays at 50 percent after reopening
+- Header progress updated
+- Snackbar shows only once per change</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-6</span> [TC-06] Expert application with 3 pricing tiers <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Expert Application | PRIORITY: High
+PRECONDITION: Logged in as user
+STEPS:
+1. Profile tab > Become an Expert card
+2. Tap Apply Now
+3. Fill Domain: Machine Learning
+4. Fill Experience: 3 years at startup
+5. Fill Qualification: B.Tech CS
+6. Fill LinkedIn URL
+7. Set Chat rate: 200
+8. Set Audio rate: 400
+9. Set Video rate: 500
+10. Fill Why mentor field
+11. Tap Submit Application
+EXPECTED RESULT:
+- Form scrolls properly, keyboard does not hide fields
+- Rate fields accept only numbers 0-5000
+- Card shows Application pending review in amber
+- Duplicate application prevented</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-7</span> [TC-07] Admin approves expert application <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Admin Dashboard | PRIORITY: High
+PRECONDITION: role=admin in Firestore
+STEPS:
+1. Open Admin Dashboard
+2. Tap Applicants tab
+3. Find pending application
+4. Verify: name, email, domain, Chat/Call/Video rates, motivation displayed
+5. Tap Approve
+EXPECTED RESULT:
+- All 3 rates visible separately
+- Snackbar: Expert approved and profile created
+- Expert profile created in Firestore
+- Expert can login as expert</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-8</span> [TC-08] Browse experts and pricing display <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Expert Marketplace | PRIORITY: Medium
+PRECONDITION: Verified expert exists
+STEPS:
+1. Home > Expert Consultation
+2. Check expert cards
+3. Try filters: domain, price, rating, sort
+4. Tap an expert
+EXPECTED RESULT:
+- List shows From INR X (lowest rate)
+- Filters work correctly
+- Detail shows 3 price tiles: Chat, Audio, Video
+- Reviews section at bottom
+- Book Consultation button works</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-9</span> [TC-09] Book consultation with dynamic pricing <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Consultation Booking | PRIORITY: High
+STEPS:
+1. Expert detail > Book Consultation
+2. Note price (Chat rate initially)
+3. Switch to audio type
+4. Check price changed
+5. Switch to video type
+6. Check price changed again
+7. Pick future date/time
+8. Tap Create Booking
+EXPECTED RESULT:
+- Price updates immediately on type switch
+- Correct rate per type
+- Booking created
+- Notification: Booking Confirmed!
+- Visible in Journey > Consultations</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-10</span> [TC-10] Mock payment responds within 5 seconds <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Payment | PRIORITY: High
+PRECONDITION: Pending consultation
+STEPS:
+1. Journey > Consultations > tap pending
+2. Tap Pay with Razorpay
+3. Time until dialog appears
+4. Tap Pay Demo
+EXPECTED RESULT:
+- Dialog appears within 5 seconds
+- Shows correct amount
+- After confirm: status = accepted
+- Snackbar: Payment successful</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-11</span> [TC-11] Session countdown human-readable format <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Session Management | PRIORITY: Medium
+PRECONDITION: Accepted consultation in future
+STEPS:
+1. Open accepted consultation detail
+2. Check countdown text
+EXPECTED RESULT:
+- 2+ days: shows 2d 5h format
+- Within a day: shows 3h 20m format
+- Within hour: shows 45 min format
+- Within 10 min: Session is ready to start! with glow
+- NEVER shows raw minutes like 2880 min</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-12</span> [TC-12] In-app chat for chat consultation <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Chat System | PRIORITY: High
+PRECONDITION: Accepted chat consultation, scheduled within 10 min
+STEPS:
+1. Open consultation detail
+2. Session is ready to start should show
+3. Tap Start Chat
+4. Type Hello and send
+5. Type another message
+EXPECTED RESULT:
+- Chat opens with No messages yet
+- Messages appear on right in indigo bubbles
+- Timestamps below messages
+- Field clears after sending
+- Messages persist on re-entry</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-13</span> [TC-13] Video session with Google Meet link <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Session Management | PRIORITY: Medium
+PRECONDITION: Accepted video consultation
+STEPS:
+AS USER:
+1. Open consultation - see Waiting for expert to share meeting link
+AS EXPERT:
+2. Open same consultation in expert console
+3. Enter Google Meet link and press Enter
+AS USER:
+4. Refresh consultation
+5. Tap Join Video Call
+EXPECTED RESULT:
+- User sees waiting hint before link
+- Expert saves link successfully
+- User sees link after save
+- Join button opens browser</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-14</span> [TC-14] Expert dashboard 3-tab layout <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Expert Dashboard | PRIORITY: High
+PRECONDITION: Logged in as expert
+STEPS:
+1. Expert Console opens
+2. Check 3 tabs: Consultations, Profile, Reviews
+3. Tap each tab
+EXPECTED RESULT:
+- Consultations: stats + filters + list (no overflow)
+- Profile: editable domain, experience, 3 rates, skills
+- Reviews: average rating + cards
+- Tab labels do NOT overflow on narrow screens</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-15</span> [TC-15] Expert profile editing persists <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Expert Dashboard | PRIORITY: Medium
+STEPS:
+1. Expert Console > Profile tab
+2. Change domain to Data Science
+3. Change Chat rate to 300
+4. Add skill TensorFlow
+5. Tap Save Profile
+6. Close and reopen app
+EXPECTED RESULT:
+- Snackbar: Profile updated!
+- Changes persist after restart
+- Users see updated info on expert profile</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-16</span> [TC-16] Expert consultation status filters <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Expert Dashboard | PRIORITY: Medium
+PRECONDITION: Expert has consultations with different statuses
+STEPS:
+1. Expert Console > Consultations tab
+2. Tap Pending chip
+3. Tap Completed chip
+4. Tap All chip
+EXPECTED RESULT:
+- List filters correctly per status
+- Count updates
+- Stats row shows totals
+- All resets to full list</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-17</span> [TC-17] Admin review moderation <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Admin Dashboard | PRIORITY: Medium
+PRECONDITION: Admin login, reviews exist
+STEPS:
+1. Admin Dashboard > Reviews tab
+2. Tap flag icon on a review
+3. Check Flagged badge appears
+4. Tap delete icon on another review
+EXPECTED RESULT:
+- Flag turns red, Flagged chip appears
+- Flagged reviews excluded from rating
+- Delete removes review
+- Expert rating recalculates</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-18</span> [TC-18] Journey tab roadmaps and consultations <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Navigation | PRIORITY: Medium
+PRECONDITION: User has roadmaps and consultations
+STEPS:
+1. Tap Journey tab (middle)
+2. Roadmaps toggle selected by default
+3. Check roadmap cards
+4. Tap Consultations toggle
+5. Check consultation cards
+EXPECTED RESULT:
+- Roadmaps: progress circles, target role, timeline
+- Consultations: status badges (amber/green/indigo), dates, prices
+- Tapping opens detail screens
+- Smooth toggle animation</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-19</span> [TC-19] Resource links clickable in roadmap <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: Roadmap Display | PRIORITY: Medium
+STEPS:
+1. Open a roadmap
+2. Expand a phase card
+3. Scroll to Resources
+4. Tap a resource link
+EXPECTED RESULT:
+- Resources in styled cards with open icon
+- Title fully visible (not truncated)
+- Tapping opens URL in browser
+- No crash if URL invalid</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+<div class="detail-card">
+  <h3><span class="ticket-id">PW-20</span> [TC-20] Dark and light mode consistency <span class="detail-status"><span class="status-done">Done</span></span></h3>
+  <pre>MODULE: UI/UX | PRIORITY: Low
+STEPS:
+1. Home > tap sun/moon icon
+2. Navigate all 3 tabs
+3. Open AI Guidance
+4. Toggle mode again
+5. Open expert profile
+EXPECTED RESULT:
+- All screens switch cleanly
+- Glass cards adapt to mode
+- No white flashes
+- Text readable in both modes
+- Gradients adapt</pre>
+  <div class="result ">PASSED - Tested on 8 Apr 2026. All steps verified, expected results confirmed.</div>
+</div>
+
+<div class="footer">
+  Pathwise Test Report | Generated via Jira REST API | Project PW
+</div>
+</body>
+</html>

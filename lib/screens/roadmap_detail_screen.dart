@@ -270,20 +270,16 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                         widget.roadmap.targetRole.isEmpty
                             ? 'Your Roadmap'
                             : widget.roadmap.targetRole,
-                        style: theme.textTheme.headlineSmall?.copyWith(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Timeline: ${widget.roadmap.timeline}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.7),
+                        widget.roadmap.timeline,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.6),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -336,17 +332,14 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                             fontWeight: FontWeight.bold,
                             color: colorScheme.primary,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
                           widget.roadmap.replanReason!,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurface.withOpacity(0.8),
+                            height: 1.4,
                           ),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -356,7 +349,7 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
             ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0),
           ],
 
-          // Skill gaps section (progressive enhancement)
+          // Skill gaps section (horizontally scrollable)
           if (widget.skillGaps != null && widget.skillGaps!.isNotEmpty) ...[
             const SizedBox(height: 16),
             GlassCard(
@@ -365,17 +358,21 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                 children: [
                   Text('Skill Gaps', style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: widget.skillGaps!.map((gap) {
-                      final confidence = (gap['confidence'] as num?)?.toDouble() ?? 0.0;
-                      final skill = gap['skill']?.toString() ?? '';
-                      return ConfidenceBadge(
-                        confidence: confidence,
-                        label: skill.isEmpty ? null : skill,
-                      );
-                    }).toList(),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: widget.skillGaps!.map((gap) {
+                        final confidence = (gap['confidence'] as num?)?.toDouble() ?? 0.0;
+                        final skill = gap['skill']?.toString() ?? '';
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ConfidenceBadge(
+                            confidence: confidence,
+                            label: skill.isEmpty ? null : skill,
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),

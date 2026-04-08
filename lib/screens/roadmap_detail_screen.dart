@@ -358,21 +358,17 @@ class _RoadmapBodyState extends State<_RoadmapBody> {
                 children: [
                   Text('Skill Gaps', style: theme.textTheme.titleSmall),
                   const SizedBox(height: 8),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: widget.skillGaps!.map((gap) {
-                        final confidence = (gap['confidence'] as num?)?.toDouble() ?? 0.0;
-                        final skill = gap['skill']?.toString() ?? '';
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ConfidenceBadge(
-                            confidence: confidence,
-                            label: skill.isEmpty ? null : skill,
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: widget.skillGaps!.map((gap) {
+                      final confidence = (gap['confidence'] as num?)?.toDouble() ?? 0.0;
+                      final skill = gap['skill']?.toString() ?? '';
+                      return ConfidenceBadge(
+                        confidence: confidence,
+                        label: skill.isEmpty ? null : skill,
+                      );
+                    }).toList(),
                   ),
                 ],
               ),

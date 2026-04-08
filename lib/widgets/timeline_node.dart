@@ -322,28 +322,52 @@ class _TimelineNodeState extends State<TimelineNode> {
 
           const SizedBox(height: 16),
 
-          // What you'll learn (extracted from the title)
-          _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
-          const SizedBox(height: 6),
-          ..._extractFocusAreas().map((area) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(Icons.arrow_right_rounded, size: 16, color: AppTheme.accentSecondary.withOpacity(0.7)),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        area,
-                        style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.4),
+          // What to focus on — show tasks if available, else parse from title
+          if (widget.stage.tasks.isNotEmpty) ...[
+            _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
+            const SizedBox(height: 6),
+            ...widget.stage.tasks.map((task) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(Icons.check_circle_outline_rounded, size: 14, color: AppTheme.accentSecondary.withOpacity(0.7)),
                       ),
-                    ),
-                  ],
-                ),
-              )),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          task,
+                          style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ] else ...[
+            _SectionHeader(icon: Icons.checklist_rounded, title: 'What to focus on', color: AppTheme.accentSecondary),
+            const SizedBox(height: 6),
+            ..._extractFocusAreas().map((area) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(Icons.arrow_right_rounded, size: 16, color: AppTheme.accentSecondary.withOpacity(0.7)),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          area,
+                          style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.4),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
 
           // Resources (clickable)
           if (widget.stage.resources.isNotEmpty) ...[

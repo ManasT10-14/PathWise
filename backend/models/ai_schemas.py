@@ -20,12 +20,12 @@ class GoalAnalysis(BaseModel):
     """Parsed output from the Goal Analyzer prompt chain step."""
 
     target_role: str = Field(
-        description="Inferred target career role (e.g., 'ML Engineer', 'Backend Engineer')"
+        description="Inferred target career role in any field (e.g., 'ML Engineer', 'Swimming Coach', 'Pastry Chef', 'UX Designer')"
     )
     career_direction: str = Field(
         description=(
             "Broader career trajectory label "
-            "(e.g., 'Data/ML Engineering', 'Full-Stack Development')"
+            "(e.g., 'Data/ML Engineering', 'Competitive Sports', 'Culinary Arts', 'Healthcare')"
         )
     )
     constraints: list[str] = Field(
@@ -119,8 +119,8 @@ class Milestone(BaseModel):
 
     title: str = Field(
         description=(
-            "Descriptive milestone title "
-            "(e.g., 'Foundations: Python and Statistics for ML')"
+            "SHORT milestone title, max 6 words "
+            "(e.g., 'Python and Statistics for ML', 'Stroke Technique Fundamentals', 'Advanced Pastry Techniques')"
         )
     )
     level: str = Field(
@@ -141,9 +141,12 @@ class Milestone(BaseModel):
     )
     tasks: list[str] = Field(
         description=(
-            "3–5 concrete, actionable tasks the learner must complete "
-            "(e.g., 'Complete Andrew Ng's ML Specialization Week 1–4', "
-            "'Build a linear regression project from scratch')."
+            "5-8 concrete, specific, actionable tasks the learner must complete. "
+            "Each task is ONE clear action. "
+            "Examples: 'Complete Andrew Ng ML Specialization Week 1-4', "
+            "'Swim 50m freestyle under 40 seconds', "
+            "'Cook all 5 French mother sauces from scratch'. "
+            "Do NOT combine multiple tasks in one string."
         )
     )
 

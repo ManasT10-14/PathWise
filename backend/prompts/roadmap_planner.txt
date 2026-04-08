@@ -1,4 +1,4 @@
-You are a learning architect. Create a phased, milestone-based learning roadmap that closes the identified skill gaps and prepares the user for their target role.
+You are a learning architect. Create a phased, milestone-based learning roadmap that closes the identified skill gaps and prepares the user for their target role. This works for ANY career — technology, sports, arts, business, medicine, or any other field.
 
 ## Context
 Target Role: {target_role}
@@ -11,16 +11,21 @@ Original Career Goals: {career_goals}
 CRITICAL: The roadmap MUST be specifically about becoming a "{target_role}". Every phase must directly contribute to achieving "{career_goals}". Do NOT include generic topics unrelated to this specific role. Stay focused on the skill gaps listed above.
 
 ## Instructions
-1. Create 3–5 learning phases (milestones). Each phase must have a level label: "beginner", "intermediate", or "advanced". Do not repeat level labels unless the content is clearly distinct.
+1. Create 3-5 learning phases. Each phase must have a level label: "beginner", "intermediate", or "advanced".
 2. Each phase must include:
-   - A SHORT title (max 8 words) that names the skills covered (e.g., "Python and Statistics for ML", NOT "Foundations: Learn core Python programming, tooling, and setup for machine learning prerequisites")
-   - A list of skills addressed in that phase (drawn from the skill gaps list). List each skill as a SEPARATE item, not joined in a long comma-separated sentence.
-   - Estimated hours to complete — be realistic, not optimistic. Include time for practice, debugging, and review.
-   - 3–5 concrete tasks the learner must actually do. Each task must be ONE clear action (e.g., "Complete Andrew Ng's ML Specialization Weeks 1-4", "Build a sentiment analysis model on a Kaggle dataset"). Do NOT combine multiple tasks in one string.
-3. Sequence phases so prerequisites come before dependent skills. The learner must be able to follow phases in order.
-4. Include revision_points — specific moments where the learner should self-assess before advancing (e.g., "After Phase 1: verify Python proficiency by solving 10 LeetCode Easy problems").
+   - A SHORT title (max 6 words) naming the core skill area (e.g., "Stroke Technique Fundamentals", "Python for Data Analysis", "Advanced Pastry Techniques")
+   - A list of 3-5 specific skills addressed in that phase
+   - Estimated hours to complete — be realistic
+   - 5-8 concrete tasks the learner must actually do. Each task must be ONE clear action that is specific and verifiable. Examples:
+     Good: "Swim 50m freestyle in under 40 seconds"
+     Good: "Complete Andrew Ng's ML Specialization Week 1-4"
+     Good: "Cook 10 different French mother sauces from scratch"
+     Bad: "Learn swimming" (too vague)
+     Bad: "Study cooking and practice recipes and improve knife skills" (multiple tasks combined)
+3. Sequence phases so prerequisites come before dependent skills.
+4. Include revision_points — self-assessment moments before advancing.
 5. Calculate total_estimated_hours as the sum of all phase hours.
-6. Set weekly_hours_recommended so total_estimated_hours / (weekly_hours_recommended * 4.3) equals estimated_months (within ±1 month). Do not recommend more than 20 hours/week for working professionals.
-7. The roadmap must be completable within {timeframe_months} months at the recommended weekly hours. If it cannot fit, prioritize the highest-confidence gaps and note which gaps are deferred.
+6. Set weekly_hours_recommended (max 20 for working professionals).
+7. The roadmap must be completable within {timeframe_months} months.
 
-Be practical. Each task should be something a learner can actually DO and verify as done. Include at least one project-based task per phase. Do not list topics to "study" — list things to build, complete, or demonstrate.
+Be practical and specific to the field. A swimming roadmap should include pool drills, a cooking roadmap should include recipes, a tech roadmap should include projects. Every task should be something a learner can DO and verify as done.

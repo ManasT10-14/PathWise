@@ -24,6 +24,8 @@ class Roadmap {
     this.replanVersion,
     this.replanReason,
     this.previousRoadmapId,
+    this.roadmapPlan,
+    this.curatedResources,
   });
 
   final String id;
@@ -36,38 +38,92 @@ class Roadmap {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, double> stageProgress;
-
-  /// Version number incremented on each replan (ADAPT-03).
   final int? replanVersion;
-
-  /// AI-generated explanation of why the roadmap was replanned (ADAPT-03).
   final String? replanReason;
-
-  /// Firestore ID of the previous roadmap document, if this is a replanned version.
   final String? previousRoadmapId;
 
-  /// Returns true if any stage has been at < 1.0 progress and updatedAt
-  /// is more than [thresholdDays] days ago (default 14 — ADAPT-01).
+  /// Enhanced structured data from backend (null for legacy/local roadmaps).
+  final Map<String, dynamic>? roadmapPlan;
+  final Map<String, dynamic>? curatedResources;
+
   bool isStalled({int thresholdDays = 14}) {
     if (updatedAt == null) return false;
     final daysSinceUpdate = DateTime.now().difference(updatedAt!).inDays;
     if (daysSinceUpdate < thresholdDays) return false;
-    // Check that at least one stage is incomplete
     return stageProgress.values.any((p) => p < 1.0);
   }
 
-  /// Returns day count since last progress update, or null if updatedAt missing.
   int? daysSinceUpdate() {
     if (updatedAt == null) return null;
     return DateTime.now().difference(updatedAt!).inDays;
   }
 
+  /// Build stages from enhanced data (backend v2) or legacy milestones.
   List<RoadmapStage> get structuredStages {
+    // Try enhanced format first (has full structured data)
+    if (roadmapPlan != null) {
+      return _stagesFromEnhanced();
+    }
+    // Fallback to legacy format
+    return _stagesFromLegacy();
+  }
+
+  /// Parse stages from enhanced roadmapPlan + curatedResources fields.
+  List<RoadmapStage> _stagesFromEnhanced() {
+    final phases = roadmapPlan?['phases'];
+    if (phases is! List || phases.isEmpty) return _stagesFromLegacy();
+
+    // Build resource map: phase_index -> list of resource strings
+    final resourceMap = <int, List<String>>{};
+    final resList = curatedResources?['resources'];
+    if (resList is List) {
+      for (final r in resList) {
+        if (r is Map) {
+          final idx = r['phase_index'];
+          final title = r['title']?.toString() ?? '';
+          final url = r['url']?.toString() ?? '';
+          final display = title.isNotEmpty ? '$title ($url)' : url;
+          if (idx is int && display.isNotEmpty) {
+            resourceMap.putIfAbsent(idx, () => []).add(display);
+          }
+        }
+      }
+    }
+
+    final stages = <RoadmapStage>[];
+    for (var i = 0; i < phases.length; i++) {
+      final phase = phases[i];
+      if (phase is! Map) continue;
+
+      final level = phase['level']?.toString() ?? (i < 3 ? ['beginner', 'intermediate', 'advanced'][i] : 'stage_${i + 1}');
+      final title = phase['title']?.toString() ?? 'Phase ${i + 1}';
+
+      // Extract tasks
+      final rawTasks = phase['tasks'];
+      final tasks = <String>[];
+      if (rawTasks is List) {
+        for (final t in rawTasks) {
+          if (t is String && t.trim().isNotEmpty) tasks.add(t.trim());
+        }
+      }
+
+      stages.add(RoadmapStage(
+        level: level,
+        title: title,
+        tasks: tasks,
+        resources: resourceMap[i] ?? [],
+      ));
+    }
+
+    return stages.isNotEmpty ? stages : _stagesFromLegacy();
+  }
+
+  /// Parse stages from legacy milestones[] + resources[] fields.
+  List<RoadmapStage> _stagesFromLegacy() {
     final stages = <RoadmapStage>[];
     final labels = ['beginner', 'intermediate', 'advanced'];
     final stageCount = milestones.length.clamp(1, 10);
 
-    // Distribute ALL resources across stages evenly
     final resourcesPerStage = <int, List<String>>{};
     for (var i = 0; i < resources.length; i++) {
       final bucket = i % stageCount;
@@ -76,8 +132,9 @@ class Roadmap {
 
     for (var i = 0; i < milestones.length; i++) {
       final level = i < labels.length ? labels[i] : 'stage_${i + 1}';
-      // Parse tasks from milestone text — extract items after ":"
       final raw = milestones[i];
+
+      // Parse tasks from legacy milestone text (after ":")
       final tasks = <String>[];
       final colonIdx = raw.indexOf(':');
       if (colonIdx > 0 && colonIdx < raw.length - 1) {
@@ -91,22 +148,28 @@ class Roadmap {
               .where((s) => s.isNotEmpty && s.length > 2),
         );
       }
+
+      // For legacy, extract just the title part (before ":")
+      String title = raw;
+      if (colonIdx > 0) {
+        title = raw.substring(0, colonIdx).trim();
+      }
+
       stages.add(RoadmapStage(
         level: level,
-        title: raw,
+        title: title,
         tasks: tasks,
         resources: resourcesPerStage[i] ?? [],
       ));
     }
+
     if (stages.isEmpty) {
-      stages.add(
-        RoadmapStage(
-          level: 'beginner',
-          title: 'Foundation',
-          tasks: const ['Complete profile', 'Core concepts'],
-          resources: resources,
-        ),
-      );
+      stages.add(RoadmapStage(
+        level: 'beginner',
+        title: 'Foundation',
+        tasks: const ['Complete profile', 'Core concepts'],
+        resources: resources,
+      ));
     }
     return stages;
   }
@@ -141,6 +204,8 @@ class Roadmap {
       replanVersion: m['replan_version'] is int ? m['replan_version'] as int : null,
       replanReason: m['replan_reason']?.toString(),
       previousRoadmapId: m['previous_roadmap_id']?.toString(),
+      roadmapPlan: m['roadmapPlan'] is Map<String, dynamic> ? m['roadmapPlan'] as Map<String, dynamic> : null,
+      curatedResources: m['curatedResources'] is Map<String, dynamic> ? m['curatedResources'] as Map<String, dynamic> : null,
     );
   }
 
@@ -182,6 +247,8 @@ class Roadmap {
       replanVersion: replanVersion ?? this.replanVersion,
       replanReason: replanReason ?? this.replanReason,
       previousRoadmapId: previousRoadmapId ?? this.previousRoadmapId,
+      roadmapPlan: roadmapPlan,
+      curatedResources: curatedResources,
     );
   }
 }

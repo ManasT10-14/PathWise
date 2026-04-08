@@ -58,12 +58,23 @@ class RoadmapDetailScreen extends StatelessWidget {
           final r = Roadmap.fromFirestore(snap.data!.id, snap.data!.data()!);
           final rawData = snap.data!.data()!;
 
-          // Extract skill gaps if available (progressive enhancement)
+          // Extract skill gaps — try enhanced format first, then legacy
           List<Map<String, dynamic>>? skillGaps;
-          if (rawData['skillGaps'] is List) {
-            skillGaps = (rawData['skillGaps'] as List)
+          // Enhanced: skillGaps is a Pydantic model dump with 'gaps' array
+          final sgData = rawData['skillGaps'];
+          if (sgData is Map && sgData['gaps'] is List) {
+            skillGaps = (sgData['gaps'] as List)
                 .whereType<Map<String, dynamic>>()
+                .map((g) => {
+                      'skill': g['skill_name']?.toString() ?? g['skill']?.toString() ?? '',
+                      'confidence': (g['confidence'] is num ? g['confidence'] as num : 0.5).toDouble(),
+                    })
+                .where((g) => (g['skill'] as String).isNotEmpty)
                 .toList();
+          }
+          // Legacy: skillGaps is a flat list of {skill, confidence}
+          if ((skillGaps == null || skillGaps.isEmpty) && sgData is List) {
+            skillGaps = (sgData as List).whereType<Map<String, dynamic>>().toList();
           }
 
           return _RoadmapBody(

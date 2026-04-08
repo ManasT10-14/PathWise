@@ -6,20 +6,41 @@ Roadmap Phases:
 {roadmap_phases}
 
 ## Instructions
-1. For each roadmap phase, suggest 2-4 specific resources. Each resource must map to the phase by its 0-based index.
+1. For each roadmap phase, suggest 3-4 specific resources. Each resource must map to the phase by its 0-based index.
 2. Each resource must include:
    - A descriptive title that includes the platform/source name
-   - A URL from well-known platforms appropriate to the field:
-     Tech: Coursera, edX, freeCodeCamp, Khan Academy, YouTube, official docs, LeetCode, Kaggle
-     Sports: YouTube coaching channels, official federation websites, training plan sites
-     Arts/Music: Skillshare, YouTube tutorials, MasterClass topics, official technique guides
-     Business: Harvard Business Review, Coursera Business, LinkedIn Learning topics
-     General: YouTube, Wikipedia reference pages, Reddit community guides, official organization sites
+   - A real URL from well-known platforms appropriate to the field
    - Type: exactly one of "course", "article", "video", "tutorial", or "book"
-   - Difficulty level matching the phase: exactly one of "beginner", "intermediate", or "advanced"
+   - Difficulty level: exactly one of "beginner", "intermediate", or "advanced"
    - The phase_index (0-based integer) this resource maps to
 3. Prioritize free resources.
-4. Include a mix of resource types per phase.
-5. Use well-known, stable URLs. When unsure of exact URL, use the platform's main page (e.g., https://www.youtube.com/results?search_query=swimming+technique for swimming videos).
+4. Include a mix of resource types per phase (not all videos or all courses).
+5. Use well-known, stable URLs only. When unsure, use search URLs or platform landing pages.
 
-IMPORTANT: Only suggest resources from well-known platforms. Do NOT invent URLs. If unsure of a specific URL, use a search URL or platform landing page instead.
+IMPORTANT: Resources MUST match the actual field. Do NOT suggest Coursera ML courses for a swimming roadmap. Match resources to the domain.
+
+## Few-Shot Examples
+
+### Example 1 — Tech Resources (ML Engineer)
+Phase 0 "Math Foundations":
+  - title: "Khan Academy: Linear Algebra", url: "https://www.khanacademy.org/math/linear-algebra", type: "course", difficulty: "beginner"
+  - title: "3Blue1Brown: Essence of Linear Algebra (YouTube)", url: "https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab", type: "video", difficulty: "beginner"
+  - title: "MIT OCW: Mathematics for Computer Science", url: "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-fall-2010/", type: "course", difficulty: "intermediate"
+
+### Example 2 — Sports Resources (Competitive Swimming)
+Phase 0 "Stroke Technique":
+  - title: "Effortless Swimming: Freestyle Technique (YouTube)", url: "https://www.youtube.com/c/EffortlessSwimming", type: "video", difficulty: "beginner"
+  - title: "SwimSmooth: Stroke Analysis Guide", url: "https://www.swimsmooth.com/improve-your-swimming.html", type: "tutorial", difficulty: "beginner"
+  - title: "U.S. Masters Swimming: Workout Library", url: "https://www.usms.org/workout-library", type: "tutorial", difficulty: "intermediate"
+
+### Example 3 — Creative Resources (Music Production)
+Phase 0 "DAW Basics":
+  - title: "Ableton: Learn Live (Official Tutorials)", url: "https://www.ableton.com/en/live-manual/", type: "tutorial", difficulty: "beginner"
+  - title: "Andrew Huang: Music Production for Beginners (YouTube)", url: "https://www.youtube.com/watch?v=rgaTLrZGlk0", type: "video", difficulty: "beginner"
+  - title: "Coursera: Music Production Specialization by Berklee", url: "https://www.coursera.org/specializations/music-production", type: "course", difficulty: "intermediate"
+
+### Example 4 — Business Resources (Startup Founder)
+Phase 0 "Business Fundamentals":
+  - title: "Y Combinator: Startup School (Free)", url: "https://www.startupschool.org/", type: "course", difficulty: "beginner"
+  - title: "The Lean Startup by Eric Ries (Book Summary)", url: "https://www.youtube.com/watch?v=RSaIOCHbuYw", type: "video", difficulty: "beginner"
+  - title: "Harvard Business Review: Entrepreneurship Articles", url: "https://hbr.org/topic/entrepreneurship", type: "article", difficulty: "intermediate"

@@ -9,10 +9,40 @@ Timeframe: {timeframe_months} months
 
 ## Instructions
 1. List skills required for the target role that the user does NOT currently possess. Cross-reference the resume and skills list carefully — do not list skills the user already has.
-2. For each gap, assign a confidence score (0.0–1.0) indicating how certain you are this is a real gap. Use 0.9+ for foundational skills clearly absent from the profile. Use 0.6–0.8 for skills that may be implicit in their experience but are not explicitly listed.
-3. Specify proficiency level required for the target role: "beginner", "intermediate", or "advanced". A gap at "beginner" means the user needs basic familiarity; "advanced" means production-level mastery is required.
-4. List prerequisite skills that should be learned before each gap skill (e.g., linear algebra before neural networks, Python before TensorFlow).
-5. Order gaps by priority: foundational prerequisites first, then core role-specific skills, then advanced specializations. A learner must be able to follow the list top-to-bottom without hitting a prerequisite they haven't covered yet.
-6. List confirmed strengths — skills the user genuinely possesses that are relevant to the target role.
+2. For each gap, assign a confidence score (0.0-1.0) indicating how certain you are this is a real gap.
+3. Specify proficiency level required: "beginner", "intermediate", or "advanced".
+4. List prerequisite skills that should be learned before each gap skill.
+5. Order gaps by priority: foundational prerequisites first, then core role-specific skills, then advanced specializations.
+6. List existing skills that ARE relevant as strengths.
+7. Assign an overall confidence score for the analysis.
 
-Focus on actionable gaps. Do not list every possible skill in the domain — only those genuinely needed for the target role within the stated timeframe. A career switcher with 5 years of backend experience does NOT need "learn what variables are." A Flutter developer targeting ML Engineer DOES need machine learning fundamentals.
+IMPORTANT: Skill gaps should be specific to the target role's ACTUAL field. For a swimmer: "flip turn technique", "interval training". For a chef: "knife skills", "sauce making". For a developer: "React", "system design". Do NOT insert tech skills into non-tech roles.
+
+## Few-Shot Examples
+
+### Example 1 — Tech Role (ML Engineer)
+Input: Skills: Python, SQL | Target: ML Engineer
+gaps:
+  - skill_name: "Linear Algebra", confidence: 0.95, proficiency: "intermediate", prerequisites: []
+  - skill_name: "PyTorch", confidence: 0.92, proficiency: "intermediate", prerequisites: ["Linear Algebra", "Python"]
+  - skill_name: "Model Deployment (MLOps)", confidence: 0.88, proficiency: "beginner", prerequisites: ["PyTorch"]
+strengths: ["Python", "SQL", "Data manipulation"]
+
+### Example 2 — Sports Role (Competitive Swimmer)
+Input: Skills: Basic swimming | Target: Competitive Swimmer
+gaps:
+  - skill_name: "Freestyle stroke technique", confidence: 0.90, proficiency: "intermediate", prerequisites: []
+  - skill_name: "Flip turn execution", confidence: 0.95, proficiency: "beginner", prerequisites: ["Freestyle stroke technique"]
+  - skill_name: "Interval training endurance", confidence: 0.88, proficiency: "intermediate", prerequisites: ["Freestyle stroke technique"]
+  - skill_name: "Race strategy and pacing", confidence: 0.85, proficiency: "beginner", prerequisites: ["Interval training endurance"]
+  - skill_name: "Competition mental preparation", confidence: 0.80, proficiency: "beginner", prerequisites: []
+strengths: ["Basic water comfort", "Swimming endurance (casual)"]
+
+### Example 3 — Creative Role (Music Producer)
+Input: Skills: Guitar | Target: Music Producer
+gaps:
+  - skill_name: "DAW proficiency (Ableton/Logic)", confidence: 0.95, proficiency: "intermediate", prerequisites: []
+  - skill_name: "Music theory for arrangement", confidence: 0.85, proficiency: "intermediate", prerequisites: []
+  - skill_name: "Sound design and synthesis", confidence: 0.90, proficiency: "beginner", prerequisites: ["DAW proficiency"]
+  - skill_name: "Mixing and mastering", confidence: 0.92, proficiency: "advanced", prerequisites: ["DAW proficiency", "Sound design"]
+strengths: ["Musical instrument proficiency", "Ear training (from guitar)"]

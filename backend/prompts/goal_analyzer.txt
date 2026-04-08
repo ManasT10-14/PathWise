@@ -15,3 +15,45 @@ Career Goals: {career_goals}
 6. Write a 2-3 sentence summary explaining your analysis in plain language. Reference specific skills and the target role by name.
 
 IMPORTANT: Do NOT force a technology interpretation. If the user wants to become a swimming expert, chef, musician, doctor, lawyer, or any non-tech role, analyze it as such. This platform serves ALL career paths.
+
+## Few-Shot Examples
+
+### Example 1 — Tech Career
+Input: Skills: Python, SQL | Interests: AI, Data | Goals: "Become an ML Engineer"
+Output:
+- target_role: "ML Engineer (Applied)"
+- career_direction: "AI/ML Engineering"
+- constraints: ["No ML framework experience", "Missing linear algebra foundation", "No model deployment experience"]
+- timeframe_months: 8
+- confidence: 0.88
+- summary: "You have a solid Python and SQL foundation which transfers well to ML. Your primary gaps are in ML frameworks (PyTorch/TensorFlow), mathematical foundations (linear algebra, calculus), and production ML deployment. An 8-month focused plan can close these gaps."
+
+### Example 2 — Sports Career
+Input: Skills: Basic swimming | Interests: Competitive swimming | Goals: "Become a competitive swimmer"
+Output:
+- target_role: "Competitive Swimmer (Amateur)"
+- career_direction: "Competitive Aquatic Sports"
+- constraints: ["No structured training history", "Unknown endurance baseline", "No competition experience", "Missing flip turn technique"]
+- timeframe_months: 12
+- confidence: 0.82
+- summary: "You have basic swimming ability which is a good starting point. To compete, you need structured stroke technique training, endurance building through interval sets, and competition experience. A 12-month plan with pool access 4-5 times per week is realistic."
+
+### Example 3 — Creative Career
+Input: Skills: Basic guitar | Interests: Music production, songwriting | Goals: "Produce my own music"
+Output:
+- target_role: "Independent Music Producer"
+- career_direction: "Music Production & Audio Engineering"
+- constraints: ["No DAW experience", "Limited music theory", "No mixing/mastering skills", "No audio engineering knowledge"]
+- timeframe_months: 10
+- confidence: 0.85
+- summary: "Your guitar skills give you musical intuition, but producing requires learning a DAW (Ableton/Logic), music theory for arrangement, and mixing/mastering techniques. A 10-month plan focusing on one DAW deeply, combined with weekly song completions, will build production competency."
+
+### Example 4 — Business Career
+Input: Skills: Sales, Communication | Interests: Startups, Leadership | Goals: "Start my own company"
+Output:
+- target_role: "Startup Founder"
+- career_direction: "Entrepreneurship & Business"
+- constraints: ["No financial modeling skills", "No product development experience", "Missing legal/compliance knowledge", "No fundraising experience"]
+- timeframe_months: 6
+- confidence: 0.75
+- summary: "Your sales and communication skills are strong founder assets. The gaps are in business fundamentals — financial modeling, product development methodology (lean startup), basic legal structures, and fundraising. A 6-month preparation plan can equip you to launch, though entrepreneurship is learn-by-doing."

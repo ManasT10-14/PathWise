@@ -16,16 +16,93 @@ CRITICAL: The roadmap MUST be specifically about becoming a "{target_role}". Eve
    - A SHORT title (max 6 words) naming the core skill area (e.g., "Stroke Technique Fundamentals", "Python for Data Analysis", "Advanced Pastry Techniques")
    - A list of 3-5 specific skills addressed in that phase
    - Estimated hours to complete — be realistic
-   - 5-8 concrete tasks the learner must actually do. Each task must be ONE clear action that is specific and verifiable. Examples:
-     Good: "Swim 50m freestyle in under 40 seconds"
-     Good: "Complete Andrew Ng's ML Specialization Week 1-4"
-     Good: "Cook 10 different French mother sauces from scratch"
-     Bad: "Learn swimming" (too vague)
-     Bad: "Study cooking and practice recipes and improve knife skills" (multiple tasks combined)
+   - 5-8 concrete tasks the learner must actually do. Each task must be ONE clear action that is specific and verifiable.
 3. Sequence phases so prerequisites come before dependent skills.
 4. Include revision_points — self-assessment moments before advancing.
 5. Calculate total_estimated_hours as the sum of all phase hours.
 6. Set weekly_hours_recommended (max 20 for working professionals).
 7. The roadmap must be completable within {timeframe_months} months.
 
-Be practical and specific to the field. A swimming roadmap should include pool drills, a cooking roadmap should include recipes, a tech roadmap should include projects. Every task should be something a learner can DO and verify as done.
+Be practical and specific to the field. Every task should be something a learner can DO and verify as done.
+
+## Few-Shot Examples
+
+### Example 1 — Tech Roadmap (ML Engineer, 8 months)
+Phase 1 (beginner): "Math Foundations for ML"
+  tasks:
+  - "Complete Khan Academy Linear Algebra course (all exercises)"
+  - "Work through 3Blue1Brown Essence of Linear Algebra video series"
+  - "Solve 20 probability problems from MIT OpenCourseWare"
+  - "Implement matrix operations from scratch in Python (no NumPy)"
+  - "Complete Calculus refresher on Khan Academy (derivatives, integrals)"
+  - "Write a blog post explaining gradient descent mathematically"
+
+Phase 2 (intermediate): "Core ML Algorithms"
+  tasks:
+  - "Complete Andrew Ng's Machine Learning Specialization Weeks 1-6"
+  - "Implement linear regression from scratch in Python"
+  - "Build a decision tree classifier on the Iris dataset"
+  - "Complete Kaggle's Intro to ML micro-course"
+  - "Build a spam classifier using scikit-learn (end-to-end)"
+  - "Implement k-means clustering on a real dataset"
+  - "Write unit tests for all your ML implementations"
+
+### Example 2 — Sports Roadmap (Competitive Swimmer, 12 months)
+Phase 1 (beginner): "Stroke Technique Foundations"
+  tasks:
+  - "Film yourself swimming 50m freestyle and analyze stroke flaws"
+  - "Practice bilateral breathing drill 3x per week for 4 weeks"
+  - "Complete 10 sessions of catch-up drill for freestyle arm entry"
+  - "Learn and practice flip turns — 20 clean turns in one session"
+  - "Swim 200m continuously without stopping (baseline test)"
+  - "Join a masters swimming club or find a coach for feedback"
+
+Phase 2 (intermediate): "Endurance and Speed Building"
+  tasks:
+  - "Build to swimming 2000m per session (3-4 sessions per week)"
+  - "Complete 10x100m interval sets with 15-second rest"
+  - "Reduce 100m freestyle time by 10% from baseline"
+  - "Learn backstroke and breaststroke basic technique"
+  - "Practice race starts from the block 50 times"
+  - "Swim a timed 400m and record splits per 100m"
+  - "Complete a structured 8-week training plan"
+
+### Example 3 — Creative Roadmap (Music Producer, 10 months)
+Phase 1 (beginner): "DAW and Music Theory Basics"
+  tasks:
+  - "Install Ableton Live Lite and complete the built-in tutorials"
+  - "Learn major and minor scales on your instrument"
+  - "Create 5 simple 8-bar loops using only stock sounds"
+  - "Study song structure: verse-chorus-bridge in 10 songs you love"
+  - "Learn basic chord progressions (I-IV-V-vi) and apply to 3 songs"
+  - "Complete YouTube tutorial series on your chosen DAW (8+ videos)"
+
+Phase 2 (intermediate): "Arrangement and Sound Design"
+  tasks:
+  - "Produce 3 complete songs (intro to outro, 2+ minutes each)"
+  - "Design 5 original synth patches from scratch (no presets)"
+  - "Recreate a professional song's arrangement in your DAW"
+  - "Learn sidechain compression and apply to a track"
+  - "Record and edit a live instrument into a production"
+  - "Study mixing basics: EQ, compression, reverb, stereo width"
+  - "Get feedback on 2 tracks from an online music community"
+
+### Example 4 — Business Roadmap (Startup Founder, 6 months)
+Phase 1 (beginner): "Business Model and Validation"
+  tasks:
+  - "Read and summarize The Lean Startup by Eric Ries"
+  - "Write a one-page business model canvas for your idea"
+  - "Interview 20 potential customers about the problem you solve"
+  - "Create a landing page describing your product (no code needed)"
+  - "Define your minimum viable product (MVP) — max 3 features"
+  - "Research 5 competitors and document their strengths/weaknesses"
+
+Phase 2 (intermediate): "MVP Build and Early Traction"
+  tasks:
+  - "Build or commission your MVP (functional, not perfect)"
+  - "Get 10 people to use your MVP and collect structured feedback"
+  - "Set up basic analytics (Google Analytics or Mixpanel)"
+  - "Create a financial projection spreadsheet (12-month runway)"
+  - "Open a business bank account and register your company"
+  - "Build a pitch deck (10 slides maximum)"
+  - "Practice your pitch with 5 people and iterate based on feedback"

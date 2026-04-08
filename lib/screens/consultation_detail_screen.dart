@@ -55,9 +55,10 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
     setState(() => _creatingOrder = true);
 
     try {
-      // Try server-side payment flow first (production)
+      // Try server-side payment flow first (production) — short timeout
       try {
-        final order = await svc.api.createPaymentOrder(consultationId: c.id);
+        final order = await svc.api.createPaymentOrder(consultationId: c.id)
+            .timeout(const Duration(seconds: 5));
         final orderId = order['order_id']?.toString() ?? '';
 
         if (orderId.isNotEmpty) {
